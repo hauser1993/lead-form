@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -H 0.0.0.0 --turbopack",
-    "build": "next build",
+    "prebuild": "node scripts/prebuild-cache.js",
+    "build": "npm run prebuild && next build",
     "start": "next start",
     "lint": "bunx tsc --noEmit && next lint",
     "format": "bunx biome format --write"
@@ -29,6 +30,7 @@
     "eslint-plugin-react-x": "^1.52.3",
     "lucide-react": "^0.475.0",
     "next": "^15.3.2",
+    "node-fetch": "^3.3.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.60.0",

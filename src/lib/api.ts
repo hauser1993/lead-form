@@ -7,6 +7,7 @@ export interface ApiResponse<T = unknown> {
   data?: T
   message?: string
   errors?: Record<string, string[]>
+  status?: number
 }
 
 export interface SubmissionResponse {
@@ -25,6 +26,14 @@ export interface Form {
   created_at: string
   updated_at: string 
   fields?: Record<string, unknown>
+}
+
+export interface FormResponse {
+  status: string
+  data: {
+    form: Form
+  }
+  timestamp: string
 }
 
 // Enhanced error types for better error handling
@@ -121,6 +130,7 @@ class ApiService {
           success: false,
           message: data.message || `Server error (${response.status})`,
           errors: data.errors,
+          status: response.status,
         }
       }
 
@@ -296,8 +306,8 @@ class ApiService {
   }
 
   // Fetch a specific form by slug
-  async getFormBySlug(slug: string): Promise<ApiResponse<Form>> {
-    return this.makeRequest<Form>(`/api/form/${slug}`)
+  async getFormBySlug(slug: string): Promise<ApiResponse<FormResponse>> {
+    return this.makeRequest<FormResponse>(`/api/form/${slug}`)
   }
 
   // Upload file to local /uploads/ directory with random filename
