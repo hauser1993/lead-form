@@ -17,6 +17,16 @@ export interface SubmissionResponse {
   updated_at: string
 }
 
+export interface Form {
+  id: string
+  title: string
+  slug: string
+  description: string
+  created_at: string
+  updated_at: string 
+  fields?: Record<string, unknown>
+}
+
 class ApiService {
   private async makeRequest<T>(
     endpoint: string,
@@ -162,6 +172,16 @@ class ApiService {
         form_data: data,
       }),
     })
+  }
+
+  // Fetch all forms
+  async getAllForms(): Promise<ApiResponse<Form[]>> {
+    return this.makeRequest<Form[]>('/forms')
+  }
+
+  // Fetch a specific form by slug
+  async getFormBySlug(slug: string): Promise<ApiResponse<Form>> {
+    return this.makeRequest<Form>(`/forms/${slug}`)
   }
 }
 

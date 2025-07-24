@@ -48,6 +48,18 @@ export interface FormData {
   // KYC Verification (empty for now)
 }
 
+interface OnboardingWizardProps {
+  form?: {
+    id: string
+    title: string
+    slug: string
+    description: string
+    created_at: string
+    updated_at: string
+    fields?: Record<string, unknown>
+  }
+}
+
 const steps = [
   { id: 'welcome', title: 'Welcome', component: WelcomeStep },
   { id: 'personal', title: 'Personal Info', component: PersonalInfoStep },
@@ -57,7 +69,7 @@ const steps = [
   { id: 'confirmation', title: 'Confirmation', component: ConfirmationStep },
 ]
 
-export default function OnboardingWizard() {
+export default function OnboardingWizard({ form }: OnboardingWizardProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [submissionId, setSubmissionId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -88,7 +100,9 @@ export default function OnboardingWizard() {
   const [isNavigatingBack, setIsNavigatingBack] = useState(false)
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
 
-  const progress = ((currentStep + 1) / steps.length) * 100
+  // Get steps for navigation (excluding welcome step)
+  const navigationSteps = steps.slice(1)
+  const progress = currentStep === 0 ? 0 : ((currentStep) / (steps.length - 1)) * 100
   const CurrentStepComponent = steps[currentStep].component
 
   // Helper function to serialize form data without file objects for localStorage
@@ -332,7 +346,8 @@ export default function OnboardingWizard() {
     console.log(`⬅️ Moving to previous step from ${currentStep}`)
     setIsNavigatingBack(true)
 
-    if (currentStep > 0) {
+    // Don't allow going back to welcome step (step 0)
+    if (currentStep > 1) {
       // Only save current step data if it's valid (don't save incomplete data when going back)
       if (currentStep > 0 && submissionId && isStepValid) {
         console.log('💾 Saving current step data before going back...')
@@ -345,7 +360,6 @@ export default function OnboardingWizard() {
       console.log(`📍 Moving from step ${currentStep} to step ${prevStep}`)
       setCurrentStep(prevStep)
       // When navigating back, set step as valid to prevent validation errors
-      // Welcome step (step 0) is always valid
       setIsStepValid(true)
 
       // Reset navigation flag after a longer delay to ensure step component has rendered
@@ -357,6 +371,12 @@ export default function OnboardingWizard() {
 
   const handleStepClick = async (stepIndex: number) => {
     console.log(`🖱️ Step clicked: ${stepIndex} (current: ${currentStep})`)
+
+    // Prevent going back to welcome step (step 0)
+    if (stepIndex === 0) {
+      console.log('🚫 Cannot navigate back to welcome step')
+      return
+    }
 
     if (stepIndex <= currentStep && submissionId) {
       const isGoingBack = stepIndex < currentStep
@@ -436,63 +456,76 @@ export default function OnboardingWizard() {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
-        <CardHeader className="space-y-6 pb-8">
-          {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-900">Investor Onboarding</h1>
-              <div className="flex items-center space-x-2">
-                {submissionId && (
-                  <Badge variant="outline" className="text-xs">
-                    ID: {submissionId.slice(-8)}
-                  </Badge>
-                )}
-                <Badge variant="secondary" className="px-3 py-1">
-                  {currentStep + 1} of {steps.length}
-                </Badge>
-              </div>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-
-          {/* Step Navigation */}
-          <div className="flex justify-between items-center">
-            {steps.map((step, index) => (
-              <div
-                key={step.id}
-                className="flex flex-col items-center space-y-2 cursor-pointer group"
-                onClick={() => handleStepClick(index)}
-              >
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
-                    index < currentStep
-                      ? 'bg-green-500 text-white'
-                      : index === currentStep
-                      ? 'bg-blue-500 text-white ring-4 ring-blue-100'
-                      : index <= currentStep
-                      ? 'bg-gray-200 text-gray-600 group-hover:bg-gray-300'
-                      : 'bg-gray-100 text-gray-400'
-                  }`}
-                >
-                  {index < currentStep ? (
-                    <Check className="w-4 h-4" />
-                  ) : (
-                    index + 1
+        {/* Conditionally render header only for non-welcome steps */}
+        {currentStep > 0 && (
+          <CardHeader className="space-y-6 pb-8">
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {form?.title || 'Investor Onboarding'}
+                  </h1>
+                  {form?.description && (
+                    <p className="text-sm text-gray-600 mt-1">{form.description}</p>
                   )}
                 </div>
-                <span
-                  className={`text-xs font-medium transition-colors duration-300 hidden sm:block ${
-                    index <= currentStep ? 'text-gray-900' : 'text-gray-400'
-                  }`}
-                >
-                  {step.title}
-                </span>
+                <div className="flex items-center space-x-2">
+                  {submissionId && (
+                    <Badge variant="outline" className="text-xs">
+                      ID: {submissionId.slice(-8)}
+                    </Badge>
+                  )}
+                  <Badge variant="secondary" className="px-3 py-1">
+                    {currentStep} of {navigationSteps.length}
+                  </Badge>
+                </div>
               </div>
-            ))}
-          </div>
-        </CardHeader>
+              <Progress value={progress} className="h-2" />
+            </div>
 
-        <CardContent className="pb-8">
+            {/* Step Navigation */}
+            <div className="flex justify-between items-center">
+              {navigationSteps.map((step, index) => {
+                const actualStepIndex = index + 1 // Offset by 1 since we're excluding welcome step
+                return (
+                  <div
+                    key={step.id}
+                    className="flex flex-col items-center space-y-2 cursor-pointer group"
+                    onClick={() => handleStepClick(actualStepIndex)}
+                  >
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                        actualStepIndex < currentStep
+                          ? 'bg-green-500 text-white'
+                          : actualStepIndex === currentStep
+                          ? 'bg-blue-500 text-white ring-4 ring-blue-100'
+                          : actualStepIndex <= currentStep
+                          ? 'bg-gray-200 text-gray-600 group-hover:bg-gray-300'
+                          : 'bg-gray-100 text-gray-400'
+                      }`}
+                    >
+                      {actualStepIndex < currentStep ? (
+                        <Check className="w-4 h-4" />
+                      ) : (
+                        index + 1
+                      )}
+                    </div>
+                    <span
+                      className={`text-xs font-medium transition-colors duration-300 hidden sm:block ${
+                        actualStepIndex <= currentStep ? 'text-gray-900' : 'text-gray-400'
+                      }`}
+                    >
+                      {step.title}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </CardHeader>
+        )}
+
+        <CardContent className={currentStep === 0 ? "pb-8 pt-8" : "pb-8"}>
           {/* Step Content */}
           <div className="min-h-[400px] transition-all duration-500 ease-in-out">
             <CurrentStepComponent
@@ -501,6 +534,8 @@ export default function OnboardingWizard() {
               onValidationChange={handleValidationChange}
               submissionId={submissionId}
               onSubmit={currentStep === steps.length - 1 ? handleSubmit : undefined}
+              onStart={currentStep === 0 ? handleNext : undefined}
+              form={form}
             />
           </div>
 
@@ -512,37 +547,39 @@ export default function OnboardingWizard() {
             </div>
           )}
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-6 border-t">
-            <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentStep === 0 || isLoading}
-              className="flex items-center space-x-2"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Previous</span>
-            </Button>
+          {/* Navigation Buttons - only show for non-welcome steps */}
+          {currentStep > 0 && (
+            <div className="flex justify-between mt-8 pt-6 border-t">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentStep <= 1 || isLoading}
+                className="flex items-center space-x-2"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>Previous</span>
+              </Button>
 
-            <Button
-              onClick={handleNext}
-              disabled={
-                currentStep === steps.length - 1 ||
-                (currentStep > 0 && !isStepValid && !isNavigatingBack) ||
-                isLoading
-              }
-              className="flex items-center space-x-2"
-            >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <>
-                  <span>{currentStep === steps.length - 1 ? 'Submit' : 'Next'}</span>
-                  <ChevronRight className="w-4 h-4" />
-                </>
-              )}
-            </Button>
-          </div>
+              <Button
+                onClick={handleNext}
+                disabled={
+                  currentStep === steps.length - 1 ||
+                  (currentStep > 0 && !isStepValid && !isNavigatingBack) ||
+                  isLoading
+                }
+                className="flex items-center space-x-2"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <span>{currentStep === steps.length - 1 ? 'Submit' : 'Next'}</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

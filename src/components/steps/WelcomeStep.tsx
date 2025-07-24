@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import { TrendingUp, Shield, DollarSign, Users } from 'lucide-react'
+import { TrendingUp, Shield, DollarSign, Users, ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import type { FormData } from '../OnboardingWizard'
 
 interface WelcomeStepProps {
@@ -10,9 +11,19 @@ interface WelcomeStepProps {
   onValidationChange: (isValid: boolean) => void
   submissionId?: string | null
   onSubmit?: () => void
+  onStart?: () => void
+  form?: {
+    id: string
+    title: string
+    slug: string
+    description: string
+    created_at: string
+    updated_at: string
+    fields?: Record<string, unknown>
+  }
 }
 
-export default function WelcomeStep({ onValidationChange }: WelcomeStepProps) {
+export default function WelcomeStep({ onValidationChange, onStart, form }: WelcomeStepProps) {
   useEffect(() => {
     // Welcome step is always valid
     onValidationChange(true)
@@ -47,10 +58,12 @@ export default function WelcomeStep({ onValidationChange }: WelcomeStepProps) {
         <div className="w-20 h-20 mx-auto bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center">
           <TrendingUp className="w-10 h-10 text-white" />
         </div>
-        <h2 className="text-3xl font-bold text-gray-900">Welcome to Your Investment Journey!</h2>
+        <h2 className="text-3xl font-bold text-gray-900">
+          {form?.title ? `Welcome to ${form.title}!` : 'Welcome to Your Investment Journey!'}
+        </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Thank you for your interest in investing with us. This quick onboarding process will
-          collect the necessary information to get your investment account set up.
+          {form?.description || 
+            'Thank you for your interest in investing with us. This quick onboarding process will collect the necessary information to get your investment account set up.'}
         </p>
       </div>
 
@@ -81,6 +94,18 @@ export default function WelcomeStep({ onValidationChange }: WelcomeStepProps) {
         <p className="text-sm text-blue-800">
           <strong>📋 What You'll Need:</strong> Personal information, address details, and identification for verification purposes.
         </p>
+      </div>
+
+      {/* Start Button */}
+      <div className="mt-8 flex justify-center">
+        <Button
+          onClick={onStart}
+          size="lg"
+          className="px-8 py-3 text-lg font-semibold bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+        >
+          Get Started
+          <ArrowRight className="w-5 h-5 ml-2" />
+        </Button>
       </div>
     </div>
   )
