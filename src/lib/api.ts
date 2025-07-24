@@ -1,6 +1,6 @@
 import type { FormData } from '@/components/OnboardingWizard'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://your-laravel-app.com'
+const API_BASE_URL = process.env.NEXT_PUBLIC_EXTERN_API_DOMAIN || 'https://your-laravel-111app.com'
 
 export interface ApiResponse<T = unknown> {
   success: boolean
@@ -142,8 +142,8 @@ class ApiService {
       return {
         success: false,
         message: error instanceof Error && error.name === 'AbortError' 
-          ? 'Request timed out. Please check your connection and try again.'
-          : 'Network error. Please check your connection and try again.',
+          ? `Request timed out. Please check your connection and try again. (${error.message})`
+          : `Network error. Please check your connection and try again. (${error instanceof Error ? error.message : String(error)})`,
       }
     }
   }

@@ -9,7 +9,7 @@ import type { FormData } from '../OnboardingWizard'
 // Ballerine KYC config (replace placeholders with real values as needed)
 const ballerineInitConfig = (submissionId: string | null | undefined) => ({
   backendConfig: {
-    baseUrl: process.env.NEXT_PUBLIC_KYC_BASE_URL || 'https://example.com/kyc',
+    baseUrl: process.env.NEXT_PUBLIC_EXTERN_API_DOMAIN || 'https://example.com/kyc',
     endpoints: {
       startVerification: '/v2/enduser/verify',
       getVerificationStatus: '/v2/enduser/verify/status/{verificationId}',
@@ -20,7 +20,7 @@ const ballerineInitConfig = (submissionId: string | null | undefined) => ({
     },
   },
   translations: {
-    remoteUrl: process.env.NEXT_PUBLIC_API_URL + '/kyc/language/en/translations.json',
+    remoteUrl: process.env.NEXT_PUBLIC_EXTERN_API_DOMAIN + '/kyc/language/en/translations.json',
   },
   endUserInfo: {
     id: submissionId || 'no-submission-id', // Use submissionId as user id 
