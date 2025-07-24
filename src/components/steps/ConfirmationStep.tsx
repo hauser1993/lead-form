@@ -32,16 +32,6 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
 
   return (
     <div className="space-y-8 animate-in fade-in-50 duration-700">
-      <div className="text-center space-y-4">
-        <div className="w-20 h-20 mx-auto bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-          <CheckCircle className="w-10 h-10 text-white" />
-        </div>
-        <h2 className="text-3xl font-bold text-gray-900">Review & Confirm</h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Please review your information before submitting your investor application.
-        </p>
-      </div>
-
       {/* Summary Card */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Application Summary</h3>
@@ -275,21 +265,6 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
           <strong>Important:</strong> By submitting this application, you acknowledge that you have read and agree to our
           Terms of Service and Privacy Policy. All investments carry risk, and past performance does not guarantee future results.
           Please ensure you understand the risks before investing.
-        </p>
-      </div>
-
-      {/* Submit Button */}
-      <div className="text-center pt-4">
-        <Button
-          onClick={handleSubmit}
-          size="lg"
-          className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-        >
-          Submit Application
-          <ArrowRight className="w-5 h-5 ml-2" />
-        </Button>
-        <p className="text-sm text-gray-500 mt-3">
-          You'll receive a confirmation email shortly after submission
         </p>
       </div>
     </div>
