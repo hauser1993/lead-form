@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { SelectWithAutocomplete, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MapPin, Home, Building2, Globe } from 'lucide-react'
 import type { FormData } from '../OnboardingWizard'
 
@@ -30,17 +30,19 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
     updateFormData({ [field]: value })
   }
 
-  const countries = [
-    'United States',
-    'Canada',
-    'United Kingdom',
-    'Australia',
-    'Germany',
-    'France',
-    'Netherlands',
-    'Singapore',
-    'Hong Kong',
-    'Other'
+  const countryOptions = [
+    { value: 'germany', label: 'Germany' },
+    { value: 'austria', label: 'Austria' },
+    { value: 'switzerland', label: 'Switzerland' },
+    { value: 'france', label: 'France' },
+    { value: 'belgium', label: 'Belgium' },
+    { value: 'united-kingdom', label: 'United Kingdom' }, 
+    { value: 'netherlands', label: 'Netherlands' }, 
+    { value: 'ireland', label: 'Ireland' }, 
+    { value: 'luxembourg', label: 'Luxembourg' }, 
+    { value: 'poland', label: 'Poland' }, 
+    { value: 'spain', label: 'Spain' },
+    { value: 'sweden', label: 'Sweden' },
   ]
 
   return (
@@ -146,7 +148,14 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
             <Label htmlFor="country" className="text-sm font-medium text-gray-700">
               Country *
             </Label>
-            <Select value={formData.country} onValueChange={(value) => handleInputChange('country', value)}>
+            <SelectWithAutocomplete 
+              name="country"
+              autoComplete="country"
+              value={formData.country} 
+              onValueChange={(value) => handleInputChange('country', value)}
+              options={countryOptions}
+              placeholder="Select your country"
+            >
               <SelectTrigger className="w-full">
                 <div className="flex items-center space-x-2">
                   <Globe className="w-4 h-4 text-gray-400" />
@@ -154,13 +163,13 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
                 </div>
               </SelectTrigger>
               <SelectContent>
-                {countries.map((country) => (
-                  <SelectItem key={country} value={country}>
-                    {country}
+                {countryOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
-            </Select>
+            </SelectWithAutocomplete>
           </div>
         </div>
       </div>

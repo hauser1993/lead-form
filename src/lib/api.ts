@@ -294,6 +294,52 @@ class ApiService {
   async getFormBySlug(slug: string): Promise<ApiResponse<Form>> {
     return this.makeRequest<Form>(`/api/form/${slug}`)
   }
+
+  // Upload file to local /uploads/ directory with random filename
+  async uploadFile(file: File): Promise<ApiResponse<{ url: string; filename: string }>> {
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 60000) // 60s timeout for file uploads
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
+          // Don't set Content-Type for FormData, let browser set it with boundary
+        },
+      })
+
+      clearTimeout(timeoutId)
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || `Upload failed (${response.status})`,
+          errors: data.errors,
+        }
+      }
+
+      return {
+        success: true,
+        data: data.data,
+      }
+    } catch (error) {
+      console.error('File upload failed:', error)
+      return {
+        success: false,
+        message: error instanceof Error && error.name === 'AbortError' 
+          ? 'File upload timed out. Please try again.'
+          : 'File upload failed. Please check your connection and try again.',
+      }
+    }
+  }
 }
 
 export const apiService = new ApiService()

@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { SelectWithAutocomplete, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { User, Mail, Phone, UserCheck, Calendar, Globe } from 'lucide-react'
 import type { FormData } from '../OnboardingWizard'
 
@@ -32,6 +32,28 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
     updateFormData({ [field]: value })
   }
 
+  const genderOptions = [
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' },
+    { value: 'other', label: 'Other' },
+    { value: 'prefer-not-to-say', label: 'Prefer not to say' },
+  ]
+
+  const nationalityOptions = [
+    { value: 'german', label: 'German' },
+    { value: 'austrian', label: 'Austrian' },
+    { value: 'swiss', label: 'Swiss' },
+    { value: 'french', label: 'French' },
+    { value: 'belgian', label: 'Belgian' },
+    { value: 'british', label: 'British' }, 
+    { value: 'dutch', label: 'Dutch' }, 
+    { value: 'irish', label: 'Irish' }, 
+    { value: 'luxembourgish', label: 'Luxembourgish' }, 
+    { value: 'polish', label: 'Polish' }, 
+    { value: 'spanish', label: 'Spanish' },
+    { value: 'swedish', label: 'Swedish' },
+  ]
+
   return (
     <div className="space-y-6 animate-in slide-in-from-right-5 duration-500">
       <div className="text-center space-y-2">
@@ -47,7 +69,14 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
           <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
             Gender *
           </Label>
-          <Select value={formData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
+          <SelectWithAutocomplete 
+            name="gender"
+            autoComplete="sex"
+            value={formData.gender} 
+            onValueChange={(value) => handleInputChange('gender', value)}
+            options={genderOptions}
+            placeholder="Select your gender"
+          >
             <SelectTrigger className="w-full">
               <div className="flex items-center space-x-2">
                 <UserCheck className="w-4 h-4 text-gray-400" />
@@ -55,12 +84,13 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-              <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+              {genderOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
-          </Select>
+          </SelectWithAutocomplete>
         </div>
 
         <div className="space-y-2">
@@ -118,17 +148,28 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
           <Label htmlFor="nationality" className="text-sm font-medium text-gray-700">
             Nationality *
           </Label>
-          <div className="relative">
-            <Input
-              id="nationality"
-              type="text"
-              placeholder="Enter your nationality"
-              value={formData.nationality}
-              onChange={(e) => handleInputChange('nationality', e.target.value)}
-              className="pl-10"
-            />
-            <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          </div>
+          <SelectWithAutocomplete 
+            name="nationality"
+            autoComplete="nationality"
+            value={formData.nationality} 
+            onValueChange={(value) => handleInputChange('nationality', value)}
+            options={nationalityOptions}
+            placeholder="Select your nationality"
+          >
+            <SelectTrigger className="w-full">
+              <div className="flex items-center space-x-2">
+                <Globe className="w-4 h-4 text-gray-400" />
+                <SelectValue placeholder="Select your nationality" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {nationalityOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </SelectWithAutocomplete>
         </div>
 
         <div className="space-y-2">

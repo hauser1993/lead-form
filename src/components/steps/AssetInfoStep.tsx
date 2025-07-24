@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { FileUpload } from '@/components/ui/file-upload'
-import { PieChart, Plus, Trash2, Calendar, Hash, DollarSign, FileText, Upload } from 'lucide-react'
+import { PieChart, Plus, Trash2, Calendar, Hash, DollarSign, FileText, Upload, CheckCircle, AlertCircle, Loader2, X } from 'lucide-react'
 import type { FormData } from '../OnboardingWizard'
+import { apiService } from '@/lib/api'
 
 interface AssetInfoStepProps {
   formData: FormData
@@ -18,6 +19,11 @@ interface AssetInfoStepProps {
   onSubmit?: () => void
 }
 
+interface UploadedFile {
+  fileName: string
+  fileUrl: string
+}
+
 interface Transaction {
   id: string
   transactionDate: string
@@ -25,6 +31,9 @@ interface Transaction {
   price: string
   notice: string
   proofFile?: File | null
+  uploadedFiles?: UploadedFile[]
+  uploadStatus?: 'idle' | 'uploading' | 'success' | 'error'
+  uploadError?: string
 }
 
 export default function AssetInfoStep({ formData, updateFormData, onValidationChange }: AssetInfoStepProps) {
@@ -52,7 +61,8 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
       quantity: '',
       price: '',
       notice: '',
-      proofFile: null
+      proofFile: null,
+      uploadStatus: 'idle'
     }
     setTransactions([...transactions, newTransaction])
   }
@@ -67,9 +77,79 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
     ))
   }
 
-  const updateTransactionFile = (id: string, file: File | null) => {
-    setTransactions(transactions.map(transaction =>
-      transaction.id === id ? { ...transaction, proofFile: file } : transaction
+  const updateTransactionFile = async (id: string, file: File | null) => {
+    if (!file) {
+      // Clear file and reset status - this now just clears the upload state, not existing files
+      setTransactions(prevTransactions => prevTransactions.map(transaction =>
+        transaction.id === id ? { 
+          ...transaction, 
+          proofFile: null, 
+          uploadStatus: 'idle',
+          uploadError: undefined
+        } : transaction
+      ))
+      return
+    }
+
+    // Set uploading status 
+    setTransactions(prevTransactions => prevTransactions.map(transaction =>
+      transaction.id === id ? { 
+        ...transaction, 
+        proofFile: file, 
+        uploadStatus: 'uploading',
+        uploadError: undefined
+      } : transaction
+    ))
+
+    try {
+      // Upload the file
+      const response = await apiService.uploadFile(file)
+      
+      if (response.success && response.data) {
+        // Add the new file to the uploadedFiles array
+        setTransactions(prevTransactions => prevTransactions.map(transaction =>
+          transaction.id === id ? { 
+            ...transaction, 
+            proofFile: null, // Clear the temporary file
+            uploadedFiles: [
+              ...(transaction.uploadedFiles || []),
+              {
+                fileName: file.name,
+                fileUrl: response.data!.url
+              }
+            ],
+            uploadStatus: 'success',
+            uploadError: undefined
+          } : transaction
+        ))
+      } else {
+        // Update with error status
+        setTransactions(prevTransactions => prevTransactions.map(transaction =>
+          transaction.id === id ? { 
+            ...transaction, 
+            uploadStatus: 'error',
+            uploadError: response.message || 'Upload failed'
+          } : transaction
+        ))
+      }
+    } catch (error) {
+      // Handle upload error
+      setTransactions(prevTransactions => prevTransactions.map(transaction =>
+        transaction.id === id ? { 
+          ...transaction, 
+          uploadStatus: 'error',
+          uploadError: 'Upload failed. Please try again.'
+        } : transaction
+      ))
+    }
+  }
+
+  const removeUploadedFile = (transactionId: string, fileIndex: number) => {
+    setTransactions(prevTransactions => prevTransactions.map(transaction =>
+      transaction.id === transactionId ? {
+        ...transaction,
+        uploadedFiles: transaction.uploadedFiles?.filter((_, index) => index !== fileIndex) || []
+      } : transaction
     ))
   }
 
@@ -245,14 +325,102 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                         <Upload className="w-4 h-4" />
                         <span>Proof Document <span className="text-gray-400">(Optional)</span></span>
                       </Label>
-                      <FileUpload
-                        id={`proof-${transaction.id}`}
-                        onFileSelect={(file) => updateTransactionFile(transaction.id, file)}
-                        selectedFile={transaction.proofFile}
-                        placeholder="Upload transaction proof"
-                        maxSize={10}
-                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                      />
+                      
+                      {/* Uploaded Files List */}
+                      {transaction.uploadedFiles && transaction.uploadedFiles.length > 0 && (
+                        <div className="space-y-2">
+                          {transaction.uploadedFiles.map((file, index) => (
+                            <div key={index} className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-xl">
+                              <div className="flex items-center space-x-3">
+                                <div className="flex-shrink-0">
+                                  {file.fileName.toLowerCase().includes('.pdf') ? (
+                                    <FileText className="w-4 h-4 text-green-600" />
+                                  ) : (
+                                    <FileText className="w-4 h-4 text-green-600" />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-green-900 truncate">
+                                    {file.fileName}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <a 
+                                  href={file.fileUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 transition-colors"
+                                >
+                                  View
+                                </a>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeUploadedFile(transaction.id, index)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Upload Status Card for current upload */}
+                      {transaction.uploadStatus === 'uploading' && (
+                        <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                          <div className="flex items-center space-x-3">
+                            <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-blue-900">
+                                {transaction.proofFile?.name}
+                              </p>
+                              <p className="text-xs text-blue-600">Uploading...</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Error Status Card */}
+                      {transaction.uploadStatus === 'error' && (
+                        <div className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-xl">
+                          <div className="flex items-center space-x-3">
+                            <AlertCircle className="w-4 h-4 text-red-500" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-red-900">
+                                {transaction.proofFile?.name || 'Upload failed'}
+                              </p>
+                              <p className="text-xs text-red-600">
+                                {transaction.uploadError || 'Upload failed'}
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => updateTransactionFile(transaction.id, null)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Upload new file area */}
+                      {(!transaction.uploadStatus || transaction.uploadStatus === 'idle' || transaction.uploadStatus === 'success') && (
+                        <FileUpload
+                          id={`proof-${transaction.id}`}
+                          onFileSelect={(file) => updateTransactionFile(transaction.id, file)}
+                          selectedFile={transaction.proofFile}
+                          placeholder={transaction.uploadedFiles && transaction.uploadedFiles.length > 0 ? "Upload additional proof document" : "Upload transaction proof"}
+                          maxSize={10}
+                          accept=".pdf,.jpg,.jpeg,.png"
+                        />
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -271,9 +439,9 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
           </p>
         </div>
 
-        <div className="p-4 bg-amber-50 rounded-lg border border-amber-100">
-          <p className="text-sm text-amber-800">
-            <strong>📁 File Upload Note:</strong> Uploaded proof documents are temporarily stored. Please ensure all files are uploaded before proceeding, as they won't be preserved if you refresh the page.
+        <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+          <p className="text-sm text-green-800">
+            <strong>📁 File Upload:</strong> Proof documents are securely uploaded to the server and permanently stored. You can view uploaded files using the "View file" link that appears after successful upload.
           </p>
         </div>
       </div>

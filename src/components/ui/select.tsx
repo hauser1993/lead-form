@@ -145,6 +145,91 @@ const SelectSeparator = React.forwardRef<
 ))
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName
 
+// Enhanced Select component with autocomplete support
+interface SelectWithAutocompleteProps {
+  children: React.ReactNode
+  value?: string
+  onValueChange?: (value: string) => void
+  name?: string
+  autoComplete?: string
+  placeholder?: string
+  options: Array<{ value: string; label: string }>
+  className?: string
+  disabled?: boolean
+}
+
+const SelectWithAutocomplete = React.forwardRef<
+  HTMLDivElement,
+  SelectWithAutocompleteProps
+>(({ 
+  children, 
+  value, 
+  onValueChange, 
+  name, 
+  autoComplete, 
+  placeholder = "Select an option",
+  options,
+  className,
+  disabled,
+  ...props 
+}, ref) => {
+  const [internalValue, setInternalValue] = React.useState(value || '')
+
+  const handleValueChange = React.useCallback((newValue: string) => {
+    setInternalValue(newValue)
+    onValueChange?.(newValue)
+  }, [onValueChange])
+
+  React.useEffect(() => {
+    if (value !== undefined) {
+      setInternalValue(value)
+    }
+  }, [value])
+
+  return (
+    <div ref={ref} className={cn("relative", className)} {...props}>
+      {/* Hidden native select for autocomplete */}
+      {name && autoComplete && (
+        <select
+          name={name}
+          autoComplete={autoComplete}
+          value={internalValue}
+          onChange={(e) => handleValueChange(e.target.value)}
+          disabled={disabled}
+          style={{
+            position: 'absolute',
+            opacity: 0,
+            pointerEvents: 'none',
+            height: 0,
+            top: 0,
+            left: 0,
+            zIndex: -1,
+          }}
+          tabIndex={-1}
+          aria-hidden="true"
+        >
+          <option value="">{placeholder}</option>
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      )}
+
+      {/* Radix Select visible to user */}
+      <SelectPrimitive.Root 
+        value={internalValue} 
+        onValueChange={handleValueChange}
+        disabled={disabled}
+      >
+        {children}
+      </SelectPrimitive.Root>
+    </div>
+  )
+})
+SelectWithAutocomplete.displayName = "SelectWithAutocomplete"
+
 export {
   Select,
   SelectGroup,
@@ -156,4 +241,5 @@ export {
   SelectSeparator,
   SelectScrollUpButton,
   SelectScrollDownButton,
+  SelectWithAutocomplete,
 }

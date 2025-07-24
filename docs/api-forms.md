@@ -30,6 +30,14 @@ This document outlines the enhanced API integration for the investor onboarding 
 - **Validation Sync**: Better coordination between frontend and backend validation
 - **Loading States**: Clear feedback for all async operations
 
+### 5. **Multiple File Upload System**
+- **Multiple Proof Documents**: Upload multiple files per transaction
+- **Individual File Management**: View, remove, or replace specific files
+- **Real-time Upload Status**: Visual feedback for each upload
+- **File Type Validation**: Restricted to JPG, JPEG, PNG, and PDF files
+- **Size Limits**: Maximum 10MB per file
+- **Secure Storage**: Files stored with random filenames in `/uploads/` directory
+
 ## API Endpoints
 
 ### Core Submission Endpoints
@@ -81,7 +89,13 @@ Content-Type: application/json
         "transactionDate": "YYYY-MM-DD",
         "quantity": "string",
         "price": "string", 
-        "notice": "string"
+        "notice": "string",
+        "uploadedFiles": [
+          {
+            "fileName": "string",
+            "fileUrl": "string"
+          }
+        ]
       }
     ]
   }
@@ -139,6 +153,25 @@ Response:
 }
 ```
 
+#### File Upload (NEW)
+```typescript
+POST /api/upload
+Content-Type: multipart/form-data
+
+FormData:
+- file: File (JPG, JPEG, PNG, PDF only, max 10MB)
+
+Response:
+{
+  "success": boolean,
+  "data": {
+    "url": "/uploads/{randomfilename}.{ext}",
+    "filename": "string"
+  },
+  "message"?: "string"
+}
+```
+
 #### Final Submission
 ```typescript
 POST /api/submissions/{id}/submit
@@ -183,6 +216,33 @@ interface ApiResponse<T> {
 - `investor_current_step`: Current step number (1-5)
 - `investor_form_data`: Serialized form data
 - `investor_completed_steps`: Array of completed step numbers
+
+## Data Structures
+
+### Transaction Interface
+```typescript
+interface UploadedFile {
+  fileName: string
+  fileUrl: string
+}
+
+interface Transaction {
+  id: string
+  transactionDate: string
+  quantity: string
+  price: string
+  notice: string
+  uploadedFiles?: UploadedFile[]
+  uploadStatus?: 'idle' | 'uploading' | 'success' | 'error'
+  uploadError?: string
+}
+```
+
+### File Upload States
+- **idle**: No upload in progress, ready for new file
+- **uploading**: File upload in progress with loading indicator
+- **success**: File uploaded successfully, added to uploadedFiles array
+- **error**: Upload failed, showing error message
 
 ### Auto-Save Behavior
 1. **Trigger**: 2 seconds after user stops typing/changing data
@@ -241,6 +301,37 @@ const updateFormData = (data: Partial<FormData>) => {
 }
 ```
 
+### File Upload Usage
+```typescript
+// Upload a file
+const uploadFile = async (file: File) => {
+  const response = await apiService.uploadFile(file)
+  if (response.success) {
+    // File uploaded successfully
+    const fileUrl = response.data.url
+    const fileName = response.data.filename
+    
+    // Add to transaction's uploadedFiles array
+    updateTransaction(transactionId, {
+      uploadedFiles: [
+        ...transaction.uploadedFiles,
+        { fileName: file.name, fileUrl }
+      ]
+    })
+  }
+}
+
+// Multiple file management
+const removeFile = (transactionId: string, fileIndex: number) => {
+  setTransactions(prev => prev.map(transaction =>
+    transaction.id === transactionId ? {
+      ...transaction,
+      uploadedFiles: transaction.uploadedFiles?.filter((_, index) => index !== fileIndex)
+    } : transaction
+  ))
+}
+```
+
 ## Backend Requirements
 
 ### Required Laravel Controller Updates
@@ -283,6 +374,13 @@ public function health() {
 public function submit(Request $request, $id) {
     // Handle final submission
 }
+
+// File upload endpoint
+public function upload(Request $request) {
+    // Handle file uploads with validation
+    // Store in public/uploads/ with random filename
+    // Return file URL for frontend use
+}
 ```
 
 ### Rate Limiting Adjustments
@@ -298,6 +396,10 @@ Route::middleware(['throttle:60,1'])->group(function () {
     Route::get('submissions/{id}', [FormApiController::class, 'show']);
     Route::post('submissions/validate', [FormApiController::class, 'validate']);
     Route::get('health', [FormApiController::class, 'health']);
+});
+
+Route::middleware(['throttle:20,1'])->group(function () {
+    Route::post('upload', [FormApiController::class, 'upload']);
 });
 ```
 
@@ -320,6 +422,14 @@ Route::middleware(['throttle:60,1'])->group(function () {
 - Sensitive data not logged
 - File uploads properly validated
 - CSRF protection maintained
+
+### File Upload Security
+- **File Type Validation**: Only JPG, JPEG, PNG, and PDF files allowed
+- **File Size Limits**: Maximum 10MB per file
+- **Random Filenames**: 26-character random strings prevent enumeration attacks
+- **Secure Storage**: Files stored in `public/uploads/` with direct URL access
+- **MIME Type Checking**: Server-side validation of actual file content
+- **Upload Directory**: Automatically created if it doesn't exist
 
 ## Performance Optimizations
 
