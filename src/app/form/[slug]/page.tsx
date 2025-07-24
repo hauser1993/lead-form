@@ -21,19 +21,19 @@ export async function generateStaticParams() {
     if (response.success && response.data && response.data.length > 0) {
       console.log(`✅ Successfully fetched ${response.data.length} forms from API`)
       const params = response.data.map((form: Form) => ({
-        formslug: form.slug,
+        slug: form.slug,
       }))
-      console.log('📝 Generated params from API:', params.map(p => p.formslug))
+      console.log('📝 Generated params from API:', params.map(p => p.slug))
       return params
     } else {
       console.log('⚠️  API call succeeded but returned no forms or empty data')
       console.log('📋 Using fallback form slugs:', FALLBACK_FORM_SLUGS)
-      return FALLBACK_FORM_SLUGS.map(slug => ({ formslug: slug }))
+      return FALLBACK_FORM_SLUGS.map(slug => ({ slug: slug }))
     }
   } catch (error) {
     console.error('❌ Error fetching forms from API during build:', error)
     console.log('📋 Using fallback form slugs:', FALLBACK_FORM_SLUGS)
-    return FALLBACK_FORM_SLUGS.map(slug => ({ formslug: slug }))
+    return FALLBACK_FORM_SLUGS.map(slug => ({ slug: slug }))
   }
 }
 

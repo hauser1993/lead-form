@@ -11,7 +11,7 @@ import { apiService, type Form } from '@/lib/api'
 
 export default function FormPageClient() {
   const params = useParams()
-  const formSlug = params.formslug as string
+  const formSlug = params.slug as string
   const [form, setForm] = useState<Form | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
