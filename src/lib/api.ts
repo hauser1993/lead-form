@@ -27,27 +27,94 @@ export interface Form {
   fields?: Record<string, unknown>
 }
 
+// Enhanced error types for better error handling
+export interface ApiError extends Error {
+  status?: number
+  code?: string
+  retryable?: boolean
+}
+
+// Configuration for retry logic
+interface RetryConfig {
+  maxAttempts: number
+  baseDelay: number
+  maxDelay: number
+  backoffMultiplier: number
+}
+
 class ApiService {
+  private retryConfig: RetryConfig = {
+    maxAttempts: 3,
+    baseDelay: 1000,
+    maxDelay: 10000,
+    backoffMultiplier: 2
+  }
+
+  private async sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  private calculateDelay(attempt: number): number {
+    const delay = Math.min(
+      this.retryConfig.baseDelay * Math.pow(this.retryConfig.backoffMultiplier, attempt - 1),
+      this.retryConfig.maxDelay
+    )
+    // Add jitter to prevent thundering herd
+    return delay + Math.random() * 1000
+  }
+
+  private isRetryableError(error: any, status?: number): boolean {
+    // Retry on network errors, 5xx errors, 429 (rate limit), and 408 (timeout)
+    return !status || status >= 500 || status === 429 || status === 408
+  }
+
   private async makeRequest<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    attempt: number = 1
   ): Promise<ApiResponse<T>> {
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30s timeout
+
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           ...options.headers,
         },
+        signal: controller.signal,
         ...options,
       })
+
+      clearTimeout(timeoutId)
 
       const data = await response.json()
 
       if (!response.ok) {
+        // Handle rate limiting with specific retry logic
+        if (response.status === 429) {
+          const retryAfter = response.headers.get('Retry-After')
+          const delay = retryAfter ? parseInt(retryAfter) * 1000 : this.calculateDelay(attempt)
+          
+          if (attempt < this.retryConfig.maxAttempts) {
+            console.warn(`Rate limited, retrying after ${delay}ms (attempt ${attempt}/${this.retryConfig.maxAttempts})`)
+            await this.sleep(delay)
+            return this.makeRequest<T>(endpoint, options, attempt + 1)
+          }
+        }
+
+        // Handle other retryable errors
+        if (this.isRetryableError(data, response.status) && attempt < this.retryConfig.maxAttempts) {
+          const delay = this.calculateDelay(attempt)
+          console.warn(`Request failed, retrying after ${delay}ms (attempt ${attempt}/${this.retryConfig.maxAttempts})`)
+          await this.sleep(delay)
+          return this.makeRequest<T>(endpoint, options, attempt + 1)
+        }
+
         return {
           success: false,
-          message: data.message || 'An error occurred',
+          message: data.message || `Server error (${response.status})`,
           errors: data.errors,
         }
       }
@@ -58,9 +125,20 @@ class ApiService {
       }
     } catch (error) {
       console.error('API Request failed:', error)
+
+      // Handle network errors with retry
+      if (this.isRetryableError(error) && attempt < this.retryConfig.maxAttempts) {
+        const delay = this.calculateDelay(attempt)
+        console.warn(`Network error, retrying after ${delay}ms (attempt ${attempt}/${this.retryConfig.maxAttempts})`)
+        await this.sleep(delay)
+        return this.makeRequest<T>(endpoint, options, attempt + 1)
+      }
+
       return {
         success: false,
-        message: 'Network error. Please check your connection and try again.',
+        message: error instanceof Error && error.name === 'AbortError' 
+          ? 'Request timed out. Please check your connection and try again.'
+          : 'Network error. Please check your connection and try again.',
       }
     }
   }
@@ -172,6 +250,39 @@ class ApiService {
         form_data: data,
       }),
     })
+  }
+
+  // Auto-save functionality for better reliability
+  async autoSave(submissionId: string, step: number, data: Partial<FormData>): Promise<ApiResponse<SubmissionResponse>> {
+    return this.makeRequest<SubmissionResponse>(`/api/submissions/${submissionId}/autosave`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        step,
+        form_data: data,
+        is_autosave: true,
+      }),
+    })
+  }
+
+  // Validate step data without saving
+  async validateStep(step: number, data: Partial<FormData>): Promise<ApiResponse<{ valid: boolean; errors?: Record<string, string[]> }>> {
+    return this.makeRequest<{ valid: boolean; errors?: Record<string, string[]> }>('/api/submissions/validate', {
+      method: 'POST',
+      body: JSON.stringify({
+        step,
+        form_data: data,
+      }),
+    })
+  }
+
+  // Check server connectivity
+  async healthCheck(): Promise<boolean> {
+    try {
+      const response = await this.makeRequest<{ status: string }>('/api/health')
+      return response.success && response.data?.status === 'ok'
+    } catch {
+      return false
+    }
   }
 
   // Fetch all forms
