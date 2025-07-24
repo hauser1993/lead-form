@@ -13,6 +13,8 @@ interface MoreInfoStepProps {
   onValidationChange: (isValid: boolean) => void
   submissionId?: string | null
   onSubmit?: () => void
+  language?: 'en' | 'de'
+  t?: (key: string, fallback?: string) => string
 }
 
 export default function MoreInfoStep({ formData, updateFormData, onValidationChange }: MoreInfoStepProps) {

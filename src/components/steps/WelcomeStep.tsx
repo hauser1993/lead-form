@@ -21,6 +21,8 @@ interface WelcomeStepProps {
     updated_at: string
     fields?: Record<string, unknown>
   }
+  language?: 'en' | 'de'
+  t?: (key: string, fallback?: string) => string
 }
 
 export default function WelcomeStep({ onValidationChange, onStart, form }: WelcomeStepProps) {

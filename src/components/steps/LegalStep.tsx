@@ -14,6 +14,8 @@ interface LegalStepProps {
   onValidationChange: (isValid: boolean) => void
   submissionId?: string | null
   onSubmit?: () => void
+  language?: 'en' | 'de'
+  t?: (key: string, fallback?: string) => string
 }
 
 export default function LegalStep({ formData, updateFormData, onValidationChange }: LegalStepProps) {

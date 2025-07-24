@@ -17,6 +17,8 @@ interface AssetInfoStepProps {
   onValidationChange: (isValid: boolean) => void
   submissionId?: string | null
   onSubmit?: () => void
+  language?: 'en' | 'de'
+  t?: (key: string, fallback?: string) => string
 }
 
 interface UploadedFile {

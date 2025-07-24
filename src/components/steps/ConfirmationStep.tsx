@@ -75,6 +75,8 @@ interface ConfirmationStepProps {
   submissionId?: string | null
   onSubmit?: () => void
   onResetData?: () => void
+  language?: 'en' | 'de'
+  t?: (key: string, fallback?: string) => string
 }
 
 export default function ConfirmationStep({ formData, onValidationChange, submissionId, onSubmit, onResetData }: ConfirmationStepProps) {

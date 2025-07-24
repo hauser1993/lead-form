@@ -15,6 +15,124 @@ import LegalStep from './steps/LegalStep'
 import ConfirmationStep from './steps/ConfirmationStep'
 import { apiService } from '@/lib/api'
 
+// Language types and translations
+type Language = 'en' | 'de'
+
+interface Translations {
+  [key: string]: {
+    en: string
+    de: string
+  }
+}
+
+// Basic translations for the wizard
+const translations: Translations = {
+  // Navigation and UI
+  'nav.previous': { en: 'Previous', de: 'Zurück' },
+  'nav.next': { en: 'Next', de: 'Weiter' },
+  'nav.submit': { en: 'Submit', de: 'Absenden' },
+  'nav.saving': { en: 'Saving...', de: 'Speichere...' },
+  'nav.online': { en: 'Online', de: 'Online' },
+  'nav.offline': { en: 'Offline', de: 'Offline' },
+  'nav.unsaved': { en: 'Unsaved', de: 'Nicht gespeichert' },
+  'nav.clearData': { en: 'Clear Data', de: 'Daten löschen' },
+  
+  // Step titles
+  'step.welcome': { en: 'Welcome', de: 'Willkommen' },
+  'step.personal': { en: 'Personal Info', de: 'Persönliche Daten' },
+  'step.address': { en: 'More Info', de: 'Weitere Infos' },
+  'step.assets': { en: 'Asset Info', de: 'Vermögenswerte' },
+  'step.legal': { en: 'Legal', de: 'Rechtliches' },
+  'step.confirmation': { en: 'Confirmation', de: 'Bestätigung' },
+  
+  // Default form title
+  'form.defaultTitle': { en: 'Investor Onboarding', de: 'Investor Onboarding' },
+  
+  // Toast messages
+  'toast.connectionRestored': { en: 'Connection restored', de: 'Verbindung wiederhergestellt' },
+  'toast.workingOffline': { en: 'Working offline - changes will be saved when connection is restored', de: 'Offline - Änderungen werden gespeichert, sobald die Verbindung wiederhergestellt ist' },
+  'toast.applicationStarted': { en: 'Application started successfully!', de: 'Antrag erfolgreich gestartet!' },
+  'toast.personalInfoUpdated': { en: 'Personal information updated!', de: 'Persönliche Daten aktualisiert!' },
+  'toast.addressInfoUpdated': { en: 'Address information updated!', de: 'Adressdaten aktualisiert!' },
+  'toast.assetInfoUpdated': { en: 'Asset information updated!', de: 'Vermögensdaten aktualisiert!' },
+  'toast.legalInfoUpdated': { en: 'Legal agreements updated!', de: 'Rechtliche Vereinbarungen aktualisiert!' },
+  'toast.applicationSubmitted': { en: 'Application submitted successfully!', de: 'Antrag erfolgreich eingereicht!' },
+  'toast.networkError': { en: 'Network error. Please check your connection.', de: 'Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.' },
+  'toast.error': { en: 'An error occurred', de: 'Ein Fehler ist aufgetreten' },
+  'toast.dataCleared': { en: 'All data cleared - starting fresh!', de: 'Alle Daten gelöscht - Neustart!' },
+  
+  // Time formatting
+  'time.justNow': { en: 'just now', de: 'gerade eben' },
+  'time.oneMinute': { en: '1 minute ago', de: 'vor 1 Minute' },
+  'time.minutes': { en: 'minutes ago', de: 'Minuten' },
+  'time.saved': { en: 'Saved', de: 'Gespeichert' },
+}
+
+// Cookie utilities
+const LANGUAGE_COOKIE_NAME = 'investor_language'
+
+const getCookieValue = (name: string): string | null => {
+  if (typeof document === 'undefined') return null
+  
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null
+  return null
+}
+
+const setCookieValue = (name: string, value: string, days: number = 365) => {
+  if (typeof document === 'undefined') return
+  
+  const expires = new Date()
+  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000))
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`
+}
+
+// Translation hook
+const useTranslation = (language: Language) => {
+  const t = useCallback((key: string, fallback?: string): string => {
+    const translation = translations[key]
+    if (translation && translation[language]) {
+      return translation[language]
+    }
+    return fallback || key
+  }, [language])
+
+  return { t }
+}
+
+// Language Flag Component
+const LanguageFlag = ({ language, isActive, onClick }: { 
+  language: Language
+  isActive: boolean
+  onClick: () => void
+}) => {
+  const flags = {
+    en: '🇺🇸',
+    de: '🇩🇪'
+  }
+  
+  const labels = {
+    en: 'English',
+    de: 'Deutsch'
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center space-x-1 px-2 py-1 rounded transition-all duration-200 ${
+        isActive 
+          ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-300' 
+          : 'text-gray-600 hover:bg-gray-100'
+      }`}
+      title={labels[language]}
+    >
+      <span className="text-sm">{flags[language]}</span>
+      <span className="text-xs font-medium hidden sm:inline">{labels[language]}</span>
+    </button>
+  )
+}
+
 export interface FormData {
   // Personal Information
   gender: string
@@ -59,15 +177,6 @@ interface OnboardingWizardProps {
   }
 }
 
-const steps = [
-  { id: 'welcome', title: 'Welcome', component: WelcomeStep },
-  { id: 'personal', title: 'Personal Info', component: PersonalInfoStep },
-  { id: 'address', title: 'More Info', component: MoreInfoStep },
-  { id: 'assets', title: 'Asset Info', component: AssetInfoStep },
-  { id: 'legal', title: 'Legal', component: LegalStep },
-  { id: 'confirmation', title: 'Confirmation', component: ConfirmationStep },
-]
-
 export default function OnboardingWizard({ form }: OnboardingWizardProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [submissionId, setSubmissionId] = useState<string | null>(null)
@@ -76,8 +185,37 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
   const [isOnline, setIsOnline] = useState(true)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [language, setLanguage] = useState<Language>('en')
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout>()
   const lastAutoSaveDataRef = useRef<string>('')
+
+  // Initialize translation hook
+  const { t } = useTranslation(language)
+
+  // Load language from cookie on mount
+  useEffect(() => {
+    const savedLanguage = getCookieValue(LANGUAGE_COOKIE_NAME) as Language
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'de')) {
+      setLanguage(savedLanguage)
+    }
+  }, [])
+
+  // Save language to cookie when it changes
+  const changeLanguage = (newLanguage: Language) => {
+    setLanguage(newLanguage)
+    setCookieValue(LANGUAGE_COOKIE_NAME, newLanguage)
+    console.log(`🌐 Language changed to: ${newLanguage}`)
+  }
+
+  // Update steps with translations
+  const steps = [
+    { id: 'welcome', title: t('step.welcome'), component: WelcomeStep },
+    { id: 'personal', title: t('step.personal'), component: PersonalInfoStep },
+    { id: 'address', title: t('step.address'), component: MoreInfoStep },
+    { id: 'assets', title: t('step.assets'), component: AssetInfoStep },
+    { id: 'legal', title: t('step.legal'), component: LegalStep },
+    { id: 'confirmation', title: t('step.confirmation'), component: ConfirmationStep },
+  ]
 
   const [formData, setFormData] = useState<FormData>({
     // Personal Information
@@ -115,7 +253,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true)
-      toast.success('Connection restored')
+      toast.success(t('toast.connectionRestored'))
       // Attempt to sync unsaved changes
       if (hasUnsavedChanges && submissionId) {
         performAutoSave()
@@ -123,7 +261,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
     }
     const handleOffline = () => {
       setIsOnline(false)
-      toast.error('Working offline - changes will be saved when connection is restored')
+      toast.error(t('toast.workingOffline'))
     }
 
     window.addEventListener('online', handleOnline)
@@ -136,7 +274,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
-  }, [hasUnsavedChanges, submissionId])
+  }, [hasUnsavedChanges, submissionId, t])
 
   // Helper function to serialize form data without file objects for localStorage
   const serializeFormData = (data: FormData) => {
@@ -285,7 +423,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
               console.log('✅ Submission created successfully:', response.data)
               setSubmissionId(response.data.id)
               setLastSaved(new Date())
-              if (showSuccessToast) toast.success('Application started successfully!')
+              if (showSuccessToast) toast.success(t('toast.applicationStarted'))
             } else {
               console.error('❌ Failed to create submission:', response)
             }
@@ -304,7 +442,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
             if (response.success) {
               console.log('✅ Personal information updated')
               setLastSaved(new Date())
-              if (showSuccessToast) toast.success('Personal information updated!')
+              if (showSuccessToast) toast.success(t('toast.personalInfoUpdated'))
             } else {
               console.error('❌ Failed to update personal info:', response)
             }
@@ -325,7 +463,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
             if (response.success) {
               console.log('✅ Address information updated')
               setLastSaved(new Date())
-              if (showSuccessToast) toast.success('Address information updated!')
+              if (showSuccessToast) toast.success(t('toast.addressInfoUpdated'))
             } else {
               console.error('❌ Failed to update address info:', response)
             }
@@ -341,7 +479,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
             if (response.success) {
               console.log('✅ Asset information updated')
               setLastSaved(new Date())
-              if (showSuccessToast) toast.success('Asset information updated!')
+              if (showSuccessToast) toast.success(t('toast.assetInfoUpdated'))
             } else {
               console.error('❌ Failed to update asset info:', response)
             }
@@ -359,7 +497,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
             if (response.success) {
               console.log('✅ Legal agreements updated')
               setLastSaved(new Date())
-              if (showSuccessToast) toast.success('Legal agreements updated!')
+              if (showSuccessToast) toast.success(t('toast.legalInfoUpdated'))
             } else {
               console.error('❌ Failed to update legal info:', response)
             }
@@ -373,7 +511,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
             if (response.success) {
               console.log('✅ Application submitted successfully')
               setLastSaved(new Date())
-              toast.success('Application submitted successfully!')
+              toast.success(t('toast.applicationSubmitted'))
               // Clear localStorage after successful submission
               localStorage.removeItem('investor_submission_id')
               localStorage.removeItem('investor_current_step')
@@ -393,7 +531,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
 
       if (response && !response.success) {
         console.error('❌ API call failed:', response)
-        toast.error(response.message || 'An error occurred')
+        toast.error(response.message || t('toast.error'))
         if (response.errors) {
           console.error('Validation errors:', response.errors)
           Object.entries(response.errors).forEach(([field, messages]) => {
@@ -408,7 +546,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
 
     } catch (error) {
       console.error('🚫 API call exception:', error)
-      toast.error('Network error. Please check your connection.')
+      toast.error(t('toast.networkError'))
       return false
     } finally {
       setIsLoading(false)
@@ -572,7 +710,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
       clearTimeout(autoSaveTimeoutRef.current)
     }
     
-    toast.success('All data cleared - starting fresh!')
+    toast.success(t('toast.dataCleared'))
     console.log('✅ All data cleared successfully')
   }
 
@@ -596,21 +734,22 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
     setIsStepValid(isValid)
   }, [isNavigatingBack, completedSteps, currentStep])
 
-  // Format last saved time
+  // Format last saved time with translations
   const formatLastSaved = (date: Date) => {
     const now = new Date()
     const diff = now.getTime() - date.getTime()
     const minutes = Math.floor(diff / 60000)
     
-    if (minutes < 1) return 'just now'
-    if (minutes === 1) return '1 minute ago'
-    if (minutes < 60) return `${minutes} minutes ago`
+    if (minutes < 1) return t('time.justNow')
+    if (minutes === 1) return t('time.oneMinute')
+    if (minutes < 60) return `${minutes} ${t('time.minutes')}`
     
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
   console.log('🎯 Current state:', {
     currentStep,
+    language,
     submissionId: submissionId ? `${submissionId.slice(-8)}...` : null,
     isStepValid,
     isNavigatingBack,
@@ -637,13 +776,27 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
               <div className="flex justify-between items-center">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    {form?.title || 'Investor Onboarding'}
+                    {form?.title || t('form.defaultTitle')}
                   </h1>
                   {form?.description && (
                     <p className="text-sm text-gray-600 mt-1">{form.description}</p>
                   )}
                 </div>
                 <div className="flex items-center space-x-2">
+                  {/* Language Selector */}
+                  <div className="flex items-center space-x-1 border rounded-lg p-1">
+                    <LanguageFlag 
+                      language="en" 
+                      isActive={language === 'en'} 
+                      onClick={() => changeLanguage('en')} 
+                    />
+                    <LanguageFlag 
+                      language="de" 
+                      isActive={language === 'de'} 
+                      onClick={() => changeLanguage('de')} 
+                    />
+                  </div>
+
                   {/* Connectivity Status */}
                   <div className="flex items-center space-x-1">
                     {isOnline ? (
@@ -652,7 +805,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
                       <WifiOff className="w-4 h-4 text-red-500" />
                     )}
                     <span className="text-xs text-gray-500">
-                      {isOnline ? 'Online' : 'Offline'}
+                      {isOnline ? t('nav.online') : t('nav.offline')}
                     </span>
                   </div>
 
@@ -662,10 +815,10 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
                     size="sm"
                     onClick={handleClearData}
                     className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-                    title="Clear all stored data (debug)"
+                    title={t('nav.clearData')}
                   >
                     <Trash2 className="w-3 h-3 mr-1" />
-                    Clear Data
+                    {t('nav.clearData')}
                   </Button>
 
                   {/* Auto-save Status */}
@@ -674,18 +827,18 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
                       {isAutoSaving ? (
                         <>
                           <Loader2 className="w-3 h-3 animate-spin text-blue-500" />
-                          <span className="text-xs text-blue-600">Saving...</span>
+                          <span className="text-xs text-blue-600">{t('nav.saving')}</span>
                         </>
                       ) : hasUnsavedChanges ? (
                         <>
                           <AlertTriangle className="w-3 h-3 text-amber-500" />
-                          <span className="text-xs text-amber-600">Unsaved</span>
+                          <span className="text-xs text-amber-600">{t('nav.unsaved')}</span>
                         </>
                       ) : lastSaved ? (
                         <>
                           <Save className="w-3 h-3 text-green-500" />
                           <span className="text-xs text-green-600">
-                            Saved {formatLastSaved(lastSaved)}
+                            {t('time.saved')} {formatLastSaved(lastSaved)}
                           </span>
                         </>
                       ) : null}
@@ -761,6 +914,8 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
               onSubmit={currentStep === steps.length - 1 ? handleSubmit : undefined}
               onStart={currentStep === 0 ? handleNext : undefined}
               form={form}
+              language={language}
+              t={t}
             />
           </div>
 
@@ -772,10 +927,10 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
                 size="sm"
                 onClick={handleClearData}
                 className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-                title="Clear all stored data (debug)"
+                title={t('nav.clearData')}
               >
                 <Trash2 className="w-3 h-3 mr-1" />
-                Clear Data
+                {t('nav.clearData')}
               </Button>
             </div>
           )}
@@ -798,7 +953,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
                 className="flex items-center space-x-2"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span>Previous</span>
+                <span>{t('nav.previous')}</span>
               </Button>
 
               <Button
@@ -814,7 +969,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
-                    <span>{currentStep === steps.length - 1 ? 'Submit' : 'Next'}</span>
+                    <span>{currentStep === steps.length - 1 ? t('nav.submit') : t('nav.next')}</span>
                     <ChevronRight className="w-4 h-4" />
                   </>
                 )}
