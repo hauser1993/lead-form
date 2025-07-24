@@ -38,12 +38,12 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
       transaction.price.trim() !== ''
     )
     onValidationChange(hasValidTransactions)
-  }, [transactions, onValidationChange])
+  }, [transactions]) // Removed onValidationChange from dependencies to prevent infinite loops
 
   // Update parent form data whenever transactions change
   useEffect(() => {
     updateFormData({ assets: transactions })
-  }, [transactions, updateFormData])
+  }, [transactions]) // Removed updateFormData from dependencies to prevent infinite loops
 
   const addTransaction = () => {
     const newTransaction: Transaction = {

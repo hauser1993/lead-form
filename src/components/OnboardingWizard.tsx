@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ChevronLeft, ChevronRight, Check, Loader2, Wifi, WifiOff, Save, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Check, Loader2, Wifi, WifiOff, Save, AlertTriangle, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import WelcomeStep from './steps/WelcomeStep'
 import PersonalInfoStep from './steps/PersonalInfoStep'
@@ -196,7 +196,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
         clearTimeout(autoSaveTimeoutRef.current)
       }
     }
-  }, [hasUnsavedChanges, submissionId, isOnline, currentStep, performAutoSave])
+  }, [hasUnsavedChanges, submissionId, isOnline, currentStep]) // Removed performAutoSave from dependencies
 
   // Load submission from localStorage on mount
   useEffect(() => {
@@ -233,7 +233,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
     }
   }, [])
 
-  // Save to localStorage whenever form data or step changes
+  // Save to localStorage whenever step or submission changes
   useEffect(() => {
     if (submissionId) {
       console.log('💾 Saving to localStorage:', {
@@ -243,10 +243,20 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
       })
       localStorage.setItem('investor_submission_id', submissionId)
       localStorage.setItem('investor_current_step', currentStep.toString())
-      localStorage.setItem('investor_form_data', JSON.stringify(serializeFormData(formData)))
       localStorage.setItem('investor_completed_steps', JSON.stringify(Array.from(completedSteps)))
     }
-  }, [submissionId, currentStep, formData, completedSteps])
+  }, [submissionId, currentStep, completedSteps])
+
+  // Debounced form data saving to localStorage
+  useEffect(() => {
+    if (submissionId) {
+      const timeoutId = setTimeout(() => {
+        localStorage.setItem('investor_form_data', JSON.stringify(serializeFormData(formData)))
+      }, 500) // Save form data after 500ms of inactivity
+
+      return () => clearTimeout(timeoutId)
+    }
+  }, [formData, submissionId])
 
   const handleApiCall = async (stepNumber: number, data: Partial<FormData>, showSuccessToast: boolean = true) => {
     console.log(`🚀 Making API call for step ${stepNumber}:`, { data, submissionId })
@@ -496,11 +506,11 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
     }
   }
 
-  const updateFormData = (data: Partial<FormData>) => {
+  const updateFormData = useCallback((data: Partial<FormData>) => {
     console.log('📝 Form data updated:', data)
     setFormData(prev => ({ ...prev, ...data }))
     setHasUnsavedChanges(true)
-  }
+  }, [])
 
   const handleSubmit = async () => {
     console.log('📤 Handling final submission...')
@@ -509,8 +519,63 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
     }
   }
 
+  const handleClearData = () => {
+    console.log('🗑️ Clearing all stored data...')
+    
+    // Clear localStorage
+    localStorage.removeItem('investor_submission_id')
+    localStorage.removeItem('investor_current_step')
+    localStorage.removeItem('investor_form_data')
+    localStorage.removeItem('investor_completed_steps')
+    
+    // Clear cookies (if any exist for this domain)
+    document.cookie.split(";").forEach(function(c) { 
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+    })
+    
+    // Reset component state
+    setSubmissionId(null)
+    setCurrentStep(0)
+    setCompletedSteps(new Set())
+    setFormData({
+      // Personal Information
+      gender: '',
+      firstName: '',
+      lastName: '',
+      birthdate: '',
+      nationality: '',
+      email: '',
+      phone: '',
+      // More Information
+      addressLine1: '',
+      addressLine2: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: '',
+      // Asset Information
+      assets: [],
+      // Legal Agreements
+      termsAccepted: false,
+      privacyAccepted: false,
+      marketingConsent: false,
+    })
+    setIsStepValid(false)
+    setIsNavigatingBack(false)
+    setLastSaved(null)
+    setHasUnsavedChanges(false)
+    
+    // Clear auto-save timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current)
+    }
+    
+    toast.success('All data cleared - starting fresh!')
+    console.log('✅ All data cleared successfully')
+  }
+
   // Enhanced validation change handler that considers navigation state
-  const handleValidationChange = (isValid: boolean) => {
+  const handleValidationChange = useCallback((isValid: boolean) => {
     // Don't show validation errors when navigating back
     if (isNavigatingBack) {
       console.log('⬅️ Navigating back - skipping validation')
@@ -527,7 +592,7 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
 
     console.log(`✅ Step ${currentStep} validation:`, isValid)
     setIsStepValid(isValid)
-  }
+  }, [isNavigatingBack, completedSteps, currentStep])
 
   // Format last saved time
   const formatLastSaved = (date: Date) => {
@@ -587,6 +652,18 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
                       {isOnline ? 'Online' : 'Offline'}
                     </span>
                   </div>
+
+                  {/* Debug: Clear Data Button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearData}
+                    className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                    title="Clear all stored data (debug)"
+                  >
+                    <Trash2 className="w-3 h-3 mr-1" />
+                    Clear Data
+                  </Button>
 
                   {/* Auto-save Status */}
                   {submissionId && (
@@ -726,3 +803,4 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
     </div>
   )
 }
+

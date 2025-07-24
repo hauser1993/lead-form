@@ -26,7 +26,7 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
                    formData.birthdate.trim() !== '' &&
                    formData.nationality.trim() !== ''
     onValidationChange(isValid)
-  }, [formData.gender, formData.firstName, formData.lastName, formData.email, formData.phone, formData.birthdate, formData.nationality, onValidationChange])
+  }, [formData.gender, formData.firstName, formData.lastName, formData.email, formData.phone, formData.birthdate, formData.nationality]) // Removed onValidationChange to prevent infinite loops
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     updateFormData({ [field]: value })

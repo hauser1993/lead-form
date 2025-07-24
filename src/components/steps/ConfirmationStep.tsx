@@ -19,7 +19,7 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
   useEffect(() => {
     // Confirmation step is always valid
     onValidationChange(true)
-  }, [onValidationChange])
+  }, []) // Removed onValidationChange to prevent infinite loops
 
   const handleSubmit = () => {
     if (onSubmit) {
