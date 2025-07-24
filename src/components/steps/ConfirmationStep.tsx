@@ -303,33 +303,11 @@ interface ConfirmationStepProps {
 }
 
 export default function ConfirmationStep({ formData, onValidationChange, submissionId, onSubmit, onResetData, t = (key, fallback) => fallback || key }: ConfirmationStepProps) {
-  const [isKycModalOpen, setIsKycModalOpen] = useState(false)
 
   useEffect(() => {
     // Confirmation step is always valid
     onValidationChange(true)
   }, [onValidationChange])
-
-  // Mount Ballerine SDK only when modal is open and submissionId is present
-  useEffect(() => {
-    if (isKycModalOpen && submissionId) {
-      // Wait for the modal and #kyc-container to be in the DOM
-      const mountKyc = async () => {
-        const { flows } = await import('@ballerine/web-ui-sdk');
-        await flows.init(ballerineInitConfig(submissionId));
-        // Defensive: check if container exists
-        const container = document.getElementById('kyc-container');
-        if (container) {
-          flows.mount({
-            flowName: 'kyc-mobile',
-            elementId: 'kyc-container',
-            useModal: false,
-          });
-        }
-      };
-      mountKyc();
-    }
-  }, [isKycModalOpen, submissionId]);
 
   const handleSubmit = () => {
     if (onSubmit) {
@@ -533,13 +511,6 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
                 <div>
                   <span className="font-medium">KYC Status:</span>
                   <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Pending</span>
-                  <button
-                    type="button"
-                    className="ml-4 px-3 py-1 text-xs border border-yellow-300 rounded bg-white hover:bg-yellow-50 transition-colors"
-                    onClick={() => setIsKycModalOpen(true)}
-                  >
-                    Details
-                  </button>
                 </div>
               </div>
 
@@ -624,29 +595,6 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
           </div>
         </div>
       </div>
-
-      {/* KYC Information Modal - now contains the mount point */}
-      {isKycModalOpen && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center"
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-          // No backdrop
-        >
-          {/* Fullscreen KYC container */}
-          <div className="relative w-full h-full max-w-none max-h-none p-0 m-0">
-            {/* Close button overlayed in top-right */}
-            <button
-              type="button"
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-2 rounded z-10 bg-white/80"
-              onClick={() => setIsKycModalOpen(false)}
-              aria-label="Close"
-            >
-              <svg width="28" height="28" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-            </button>
-            <div id="kyc-container" className="w-full h-full" />
-          </div>
-        </div>
-      )}
 
     </div>
   )
