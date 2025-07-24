@@ -1,0 +1,76 @@
+# Investor Onboarding Wizard Todos
+
+## Completed ✅
+- [x] Created modern multistep investor onboarding wizard
+- [x] Updated to 6 investor-focused steps (Welcome, Personal Info, More Info, Asset Info, KYC, Confirmation)
+- [x] Updated Personal Information step with gender, first name, last name, email, phone
+- [x] Created More Information step with address fields (Address Line 1, Address Line 2, City, State, Postal Code, Country)
+- [x] Created Asset Information placeholder step (to be completed later)
+- [x] Created KYC Verification placeholder step (to be completed later)
+- [x] Created Confirmation step with application summary
+- [x] Updated welcome step for investment context
+- [x] Implemented form validation for required fields
+- [x] Added investor-specific messaging and branding
+- [x] Enhanced UI components with custom styling
+- [x] Removed old step components
+- [x] Successfully deployed investor onboarding wizard
+- [x] Tested complete investor flow
+- [x] Added comprehensive legal agreements step
+- [x] Implemented Terms of Service and Privacy Policy acceptance
+- [x] Added optional marketing communications consent
+- [x] Updated confirmation step to show legal agreement status
+- [x] Enhanced form validation for legal requirements
+- [x] Deployed updated wizard with legal step
+- [x] **COMPLETE API INTEGRATION WITH LARAVEL BACKEND**
+- [x] Created comprehensive API service with all endpoints
+- [x] Implemented step-by-step submission tracking with unique IDs
+- [x] Added automatic form persistence with localStorage
+- [x] Added toast notifications for user feedback on all API operations
+- [x] Implemented loading states and proper error handling
+- [x] Added submission ID display in UI header
+- [x] Created detailed API documentation with Laravel examples
+- [x] Fixed all TypeScript linting issues
+- [x] Deployed complete API-integrated version
+- [x] **FIXED DROPDOWN SIZING INCONSISTENCY**
+- [x] Updated Select component height to match Input components (h-12)
+- [x] Enhanced dropdown styling with consistent rounded corners and focus states
+- [x] Improved dropdown content and item styling for better UX
+- [x] Deployed updated version with consistent form styling
+- [x] **FIXED VALIDATION ERRORS ON BACKWARD NAVIGATION**
+- [x] Implemented navigation state tracking to suppress validation errors when going back
+- [x] Added comprehensive console logging for development debugging
+- [x] Enhanced user experience by preventing confusing validation messages
+- [x] **IMPLEMENTED REPEATER TABLE FORM ON STEP 4 (Asset Information)**
+- [x] Replaced placeholder content with comprehensive transaction repeater form
+- [x] Added dynamic add/remove functionality for multiple transaction entries
+- [x] Implemented fields: transaction date, quantity, price per unit, and notes
+- [x] Added real-time total value calculation and transaction summary
+- [x] Updated confirmation step to display detailed asset transaction summary
+- [x] Created Textarea UI component matching the design system
+- [x] Added proper form validation requiring at least one complete transaction
+- [x] Enhanced user experience with formatting helpers for currency and numbers
+- [x] Deployed version 11 with complete asset transaction functionality
+- [x] **ADDED FILE UPLOAD TO TRANSACTION REPEATER**
+- [x] Created comprehensive FileUpload component with drag-and-drop functionality
+- [x] Added proof document upload field to each transaction
+- [x] Implemented file validation (type checking, size limits up to 10MB)
+- [x] Added file preview and removal functionality with proper icons
+- [x] Updated transaction interface to include proof file handling
+- [x] Enhanced confirmation step to display uploaded file status
+- [x] Added localStorage serialization handling to exclude file objects
+- [x] Included helpful user notifications about file persistence limitations
+- [x] Deployed version 12 with complete file upload functionality
+
+## Future Enhancements 💡
+- [ ] Complete KYC Verification step with document upload functionality
+- [ ] Add file upload components for identity documents and verification
+- [ ] Enhance asset information with investment categories and asset types
+- [ ] Add investment preferences and risk tolerance assessment
+- [ ] Implement accredited investor verification workflow
+- [ ] Add email notifications for application status updates
+- [ ] Create investor dashboard preview after successful onboarding
+- [ ] Add multi-language support for international investors
+- [ ] Implement advanced security features (2FA, biometric verification)
+- [ ] Add integration with external financial data providers
+- [ ] Implement proper file storage backend for proof documents
+- [ ] Add bulk file upload functionality for multiple documents at once
