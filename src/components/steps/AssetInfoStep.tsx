@@ -153,22 +153,19 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
     ))
   }
 
-  const formatCurrency = (value: string) => {
-    // Remove non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, '')
-
-    // Ensure only one decimal point
-    const parts = numericValue.split('.')
-    if (parts.length > 2) {
-      return parts[0] + '.' + parts.slice(1).join('')
+  // Helper to format numbers as XXX.XXX,XX (European style)
+  function formatEuropeanNumber(value: string | number) {
+    if (value === undefined || value === null || value === '') return '';
+    let number: number;
+    if (typeof value === 'string') {
+      // Remove thousands separators and convert comma to dot for decimal
+      const cleaned = value.replace(/\./g, '').replace(',', '.');
+      number = parseFloat(cleaned);
+    } else {
+      number = value;
     }
-
-    return numericValue
-  }
-
-  const formatNumber = (value: string) => {
-    // Remove non-numeric characters except decimal point
-    return value.replace(/[^0-9.]/g, '')
+    if (isNaN(number)) return '';
+    return number.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   return (
@@ -260,9 +257,17 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                         <Input
                           id={`quantity-${transaction.id}`}
                           type="text"
-                          placeholder="e.g., 100"
+                          placeholder="z. B. 100"
                           value={transaction.quantity}
-                          onChange={(e) => updateTransaction(transaction.id, 'quantity', formatNumber(e.target.value))}
+                          onChange={(e) => {
+                            // Remove formatting for internal state
+                            const raw = e.target.value.replace(/\./g, '').replace(',', '.');
+                            updateTransaction(transaction.id, 'quantity', raw);
+                          }}
+                          onBlur={(e) => {
+                            // Format for display
+                            updateTransaction(transaction.id, 'quantity', formatEuropeanNumber(e.target.value));
+                          }}
                           className="pl-10"
                           required
                         />
@@ -273,15 +278,23 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                     {/* Price */}
                     <div className="space-y-2">
                       <Label htmlFor={`price-${transaction.id}`} className="text-sm font-medium text-gray-700">
-                        Price per Unit ($) *
+                        Price per Unit (€) *
                       </Label>
                       <div className="relative">
                         <Input
                           id={`price-${transaction.id}`}
                           type="text"
-                          placeholder="e.g., 25.50"
+                          placeholder="z. B. 25,50"
                           value={transaction.price}
-                          onChange={(e) => updateTransaction(transaction.id, 'price', formatCurrency(e.target.value))}
+                          onChange={(e) => {
+                            // Remove formatting for internal state
+                            const raw = e.target.value.replace(/\./g, '').replace(',', '.');
+                            updateTransaction(transaction.id, 'price', raw);
+                          }}
+                          onBlur={(e) => {
+                            // Format for display
+                            updateTransaction(transaction.id, 'price', formatEuropeanNumber(e.target.value));
+                          }}
                           className="pl-10"
                           required
                         />
@@ -295,12 +308,12 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                         Total Value
                       </Label>
                       <div className="h-12 flex items-center px-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600">
-                        ${transaction.quantity && transaction.price
-                          ? (parseFloat(transaction.quantity) * parseFloat(transaction.price)).toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })
-                          : '0.00'}
+                        {transaction.quantity && transaction.price
+                          ? formatEuropeanNumber(
+                              parseFloat(transaction.quantity.replace(/\./g, '').replace(',', '.')) *
+                              parseFloat(transaction.price.replace(/\./g, '').replace(',', '.'))
+                            )
+                          : '0,00'} €
                       </div>
                     </div>
 

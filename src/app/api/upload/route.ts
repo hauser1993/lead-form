@@ -59,7 +59,10 @@ export async function POST(request: NextRequest) {
     await writeFile(filePath, buffer)
 
     // Return the file URL
-    const fileUrl = `/uploads/${filename}`
+    // Build absolute URL
+    const protocol = request.headers.get('x-forwarded-proto') || 'http';
+    const host = request.headers.get('host') || 'localhost:3000';
+    const fileUrl = `${protocol}://${host}/uploads/${filename}`;
 
     return NextResponse.json({
       success: true,
