@@ -20,7 +20,230 @@ const ballerineInitConfig = (submissionId: string | null | undefined) => ({
     },
   },
   translations: {
-    remoteUrl: process.env.NEXT_PUBLIC_EXTERN_API_DOMAIN + '/kyc/language/en/translations.json',
+    // remoteUrl: 'https://example.com/translations.json',
+    overrides: {
+      "en": {
+        "welcome": {
+          "title": "Verify your identity",
+          "button": "Choose document type",
+          "description": "We need some information to help us confirm your identity.",
+          "tip": "Verifying usually takes a few hours."
+        },
+        "qrcode": {
+          "title": "Continue on your mobile",
+          "description": "To continue, please scan this QR code with your phone. You will complete the next steps on your mobile device.",
+          "button": "Continue on this device"
+        },
+        "document-selection": {
+          "title": "Upload ID",
+          "description": "Choose the document type you would like to identify with",
+          "tip": "Choose document type"
+        },
+        "document-options": {
+          "passport-title": "Passport",
+          "passport-description": "Your official travel document.",
+          "id_card-title": "ID Card",
+          "id_card-description": "Government-issued personal ID.",
+          "drivers_license-title": "Drivers license",
+          "drivers_license-description": "Government-issued Drivers license",
+          "voter_id-title": "Voter ID",
+          "voter_id-description": "Government-issued Voter ID"
+        },
+        "document-start": {
+          "title": "Document",
+          "button": "Take a picture",
+          "description": "Please take a picture of your document. Make sure its fully visible inside the picture.",
+          "operating_license": {
+            "title": "Operating license",
+            "button": "Take a picture",
+            "description": "Please take a picture of your business’s operating license. Make sure the document is fully visible inside the picture."
+          },
+          "business_registration": {
+            "title": "Business Registration",
+            "button": "Take a picture",
+            "description": "Please take a picture of your business registration document. Make sure the document is fully visible inside the picture."
+          },
+          "proof_of_business_tax_id": {
+            "title": "TIN ID / Certificate",
+            "button": "Take a picture",
+            "description": "Please take a picture of your business TIN ID or certificate. Make sure the document is fully visible inside the picture."
+          },
+          "bank_statement": {
+            "title": "Bank Statement/Letter",
+            "button": "Take a picture",
+            "description": "Please take a picture of a bank statement or of a letter from the bank. Make sure the document is fully visible inside the picture."
+          }
+        },
+        "document-photo": {
+          "title": "Document Upload",
+          "description": "Place the document inside the frame and take a picture. Make sure it is not cut or has any glare.",
+          "id_card": {
+            "title": "Upload ID",
+            "description": "Place your ID inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "passport": {
+            "title": "Passport",
+            "description": "Place your passport inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "voter_id": {
+            "title": "Voter ID front side",
+            "description": "Place your voter card inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "ife_card": {
+            "title": "IFE card front side",
+            "description": "Place your IFE card inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "ine_card": {
+            "title": "INE card front side",
+            "description": "Place your INE card inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "drivers_license": {
+            "title": "Drivers license",
+            "description": "Place your drivers license inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "proof_of_business_tax_id": {
+            "title": "Business TIN ID/certificate",
+            "description": "Place the business TIN ID/certificate inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "bank_statement": {
+            "title": "Bank Statement/Letter",
+            "description": "Place the bank Statement/letter inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "business_registration": {
+            "title": "Business Registration",
+            "description": "Place the business registration document inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "operating_license": {
+            "title": "Operating license",
+            "description": "Place the operating license document inside the frame and take a picture. Make sure it is not cut or has any glare."
+          }
+        },
+        "document-photo-back": {
+          "passport": {
+            "title": "Passport back side",
+            "description": "Place the back side of your Passport card inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "id_card": {
+            "title": "ID Card back side",
+            "description": "Place the back side of your ID Card inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "voter_id": {
+            "title": "Voter ID back side",
+            "description": "Place the back side of your Voter ID inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "ife_card": {
+            "title": "IFE card back side",
+            "description": "Place the back side of your IFE card inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "ine_card": {
+            "title": "INE card back side",
+            "description": "Place the back side of your INE card inside the frame and take a picture. Make sure it is not cut or has any glare."
+          },
+          "drivers_license": {
+            "title": "Drivers license back side",
+            "description": "Place the back side of your Drivers license inside the frame and take a picture. Make sure it is not cut or has any glare."
+          }
+        },
+        "check-document": {
+          "title": "Review picture",
+          "description": "Make sure the information is seen clearly, with no blur or glare."
+        },
+        "document-photo-back-start": {
+          "title": "ID back side",
+          "description": "Please take a picture of the back side of your ID",
+          "button": "Take photo",
+          "voter_id": {
+            "description": "Please take a picture of the back side of your Voter ID",
+            "title": "Voter ID back side"
+          },
+          "drivers_license": {
+            "title": "Drivers license back side",
+            "description": "Please take a picture of the back side of your Drivers license"
+          }
+        },
+        "check-document-photo-back": {
+          "title": "Review picture",
+          "description": "Make sure the information is seen clearly, with no blur or glare."
+        },
+        "navigation-buttons": {
+          "next": "Looks good",
+          "back": "Take again"
+        },
+        "selfie-start": {
+          "title": "Selfie",
+          "button": "Take a selfie",
+          "description": "Make sure your face is clear and is fully inside the frame."
+        },
+        "selfie": {
+          "title": "Selfie",
+          "description": "Place your face inside the frame and take a picture. Make sure it is clearly visible."
+        },
+        "check-selfie": {
+          "title": "Review picture",
+          "description": "Make sure your face is clearly visible and fits inside the frame."
+        },
+        "final": {
+          "title": "Successfully Uploaded",
+          "description": "Your documents got successfully uploaded, you will receive an email when we verified your identity.",
+          "button": "Close Window"
+        },
+        "loader": {
+          "text-one": "We are currently uploading your documents",
+          "text-two": "This may take a few seconds",
+          "text-three": "Taking more than usual"
+        },
+        "resubmission": {
+          "201-title": "Missing images",
+          "201-button": "Retry uploading",
+          "201-description": "It seems like you haven&#039;t sent us all of the images we need in order to verify you. Please retry uploading the images.",
+          "204-title": "Couldn’t verify the images",
+          "204-button": "Retry uploading",
+          "204-description": "The image of the document you have sent us was in bad quality. Please retry uploading the images",
+          "205-title": "Couldn’t verify the images",
+          "205-button": "Retry uploading",
+          "205-description": "The document you have sent us seems to be damaged, please retry uploading using a different document.",
+          "206-title": "Unsupported document",
+          "206-button": "Choose different document",
+          "206-description": "The document you have sent us was not supported. Please take a photo of a valid document.",
+          "207-title": "Expired document",
+          "207-button": "Retry uploading",
+          "207-description": "The document you have sent seems to be expired. Please take a photo of a valid document.",
+          "606-title": "Unclear selfie",
+          "606-button": "Retry uploading",
+          "606-description": "It seems like the photo of your face was not clear, please try again.",
+          "614-title": "Document not fully visible",
+          "614-button": "Retry uploading",
+          "614-description": "The document you have sent is not fully inside the picture.",
+          "615-title": "Back side not fully visible",
+          "615-button": "Retry uploading",
+          "615-description": "The back side of the document you have sent is not fully inside the picture."
+        },
+        "loading": {
+          "review-hint": "Uploading your document"
+        },
+        "decline": {
+          "title": "Failed to verify",
+          "button": "Close",
+          "description": "It seems like there was an issue verifying your documents."
+        },
+        "error": {
+          "title": "Failed to verify",
+          "button": "Close"
+        },
+        "timeout": {
+          "title": "Something went wrong",
+          "button": "Close",
+          "description": "It seems like there was an issue verifiying your documents."
+        },
+        "general": {
+          "online": "You are online!",
+          "offline": "You are offline, please check your connection",
+          "errorDocuments": "Error sending documents",
+          "errorDocumentVerification": "Error document verification",
+          "errorCameraAccess": "Cannot access your device&#039;s camera. To proceed, go to the app&#039;s settings and enable camera permissions."
+        }
+      }
+    }
   },
   endUserInfo: {
     id: submissionId || 'no-submission-id', // Use submissionId as user id 
@@ -85,22 +308,28 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
   useEffect(() => {
     // Confirmation step is always valid
     onValidationChange(true)
+  }, [onValidationChange])
 
-    // Mount KYC modal automatically if submissionId is present
-    if (submissionId) {
-
-      import('@ballerine/web-ui-sdk').then(({ flows }) => {
-        flows.init(ballerineInitConfig(submissionId)).then(() => {
-        flows.mount({
-          flowName: 'kyc-mobile',
-          elementId: 'kyc-container',
+  // Mount Ballerine SDK only when modal is open and submissionId is present
+  useEffect(() => {
+    if (isKycModalOpen && submissionId) {
+      // Wait for the modal and #kyc-container to be in the DOM
+      const mountKyc = async () => {
+        const { flows } = await import('@ballerine/web-ui-sdk');
+        await flows.init(ballerineInitConfig(submissionId));
+        // Defensive: check if container exists
+        const container = document.getElementById('kyc-container');
+        if (container) {
+          flows.mount({
+            flowName: 'kyc-mobile',
+            elementId: 'kyc-container',
             useModal: false,
           });
-        });
-      })
+        }
+      };
+      mountKyc();
     }
-    // onValidationChange is stable from parent, safe to omit from deps to prevent infinite loop
-  }, [])
+  }, [isKycModalOpen, submissionId]);
 
   const handleSubmit = () => {
     if (onSubmit) {
@@ -121,6 +350,17 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
 
   return (
     <div className="space-y-8 animate-in fade-in-50 duration-700">
+      <div className="rounded-2xl bg-green-50 border border-gray-200 p-6 flex flex-col items-center mb-8">
+        <div className="w-20 h-20 mb-4 flex items-center justify-center rounded-full bg-white">
+          <CheckCircle className="w-12 h-12 text-green-500" />
+        </div>
+        <h2 className="text-3xl font-bold text-green-900 mb-2">
+          {t('confirmation.title', 'Application Submitted!')}
+        </h2>
+        <p className="text-lg text-green-800 max-w-xl mx-auto">
+          {t('confirmation.description', 'Please review your details and complete the KYC process to continue.')}
+        </p>
+      </div>
       {/* Summary Card */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('confirmation.summaryTitle')}</h3>
@@ -385,46 +625,25 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
         </div>
       </div>
 
-      {/* KYC Modal Mount Point */}
-      <div id="kyc-container"></div>
-
-      {/* KYC Information Modal - now empty */}
+      {/* KYC Information Modal - now contains the mount point */}
       {isKycModalOpen && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center"
-          style={{ background: 'rgba(0,0,0,0.5)', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-          onClick={() => setIsKycModalOpen(false)}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+          // No backdrop
         >
-          <div
-            className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto relative"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">KYC Verification Details</h3>
-              <button
-                type="button"
-                className="text-gray-400 hover:text-gray-700 p-1 rounded"
-                onClick={() => setIsKycModalOpen(false)}
-                aria-label="Close"
-              >
-                {/* X icon using SVG */}
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
-              </button>
-            </div>
-            <div className="space-y-4">
-              <p className="text-gray-500 text-center py-8">
-                This modal is empty.
-              </p>
-              <div className="flex justify-end pt-4">
-                <button
-                  type="button"
-                  className="px-6 py-2 bg-yellow-100 text-yellow-900 rounded hover:bg-yellow-200 font-medium"
-                  onClick={() => setIsKycModalOpen(false)}
-                >
-                  Got it
-                </button>
-              </div>
-            </div>
+          {/* Fullscreen KYC container */}
+          <div className="relative w-full h-full max-w-none max-h-none p-0 m-0">
+            {/* Close button overlayed in top-right */}
+            <button
+              type="button"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-2 rounded z-10 bg-white/80"
+              onClick={() => setIsKycModalOpen(false)}
+              aria-label="Close"
+            >
+              <svg width="28" height="28" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+            </button>
+            <div id="kyc-container" className="w-full h-full" />
           </div>
         </div>
       )}
