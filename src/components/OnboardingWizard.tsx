@@ -626,8 +626,8 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
-        {/* Conditionally render header only for non-welcome steps */}
-        {currentStep > 0 && (
+        {/* Conditionally render header only for non-welcome and non-confirmation steps */}
+        {currentStep > 0 && currentStep < steps.length - 1 && (
           <CardHeader className="space-y-6 pb-8">
             {/* Progress Bar */}
             <div className="space-y-2">
@@ -743,7 +743,11 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
           </CardHeader>
         )}
 
-        <CardContent className={currentStep === 0 ? "pb-8 pt-8" : "pb-8"}>
+        <CardContent className={
+          currentStep === 0 || currentStep === steps.length - 1
+            ? "pb-8 pt-8"
+            : "pb-8"
+        }>
           {/* Step Content */}
           <div className="min-h-[400px] transition-all duration-500 ease-in-out">
             <CurrentStepComponent
@@ -757,6 +761,22 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
             />
           </div>
 
+          {/* Add Clear Data button on confirmation page */}
+          {currentStep === steps.length - 1 && (
+            <div className="flex justify-end mt-6">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearData}
+                className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                title="Clear all stored data (debug)"
+              >
+                <Trash2 className="w-3 h-3 mr-1" />
+                Clear Data
+              </Button>
+            </div>
+          )}
+
           {/* Loading Indicator */}
           {isLoading && (
             <div className="flex items-center justify-center py-4">
@@ -765,8 +785,8 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
             </div>
           )}
 
-          {/* Navigation Buttons - only show for non-welcome steps */}
-          {currentStep > 0 && (
+          {/* Navigation Buttons - only show for non-welcome and non-confirmation steps */}
+          {currentStep > 0 && currentStep < steps.length - 1 && (
             <div className="flex justify-between mt-8 pt-6 border-t">
               <Button
                 variant="outline"
