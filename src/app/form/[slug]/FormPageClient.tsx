@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams, notFound } from 'next/navigation'
-import { Loader2, AlertCircle } from 'lucide-react'
+import { useParams } from 'next/navigation'
+import { Loader2, AlertCircle, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
 import OnboardingWizard from '@/components/OnboardingWizard'
 import { apiService, type Form } from '@/lib/api'
 
@@ -16,74 +18,34 @@ export default function FormPageClient() {
 
   useEffect(() => {
     async function fetchForm() {
-      console.debug('[FormPageClient] fetchForm called with formSlug:', formSlug)
-      
-      // If no slug provided, show 404
       if (!formSlug) {
-        console.debug('[FormPageClient] No formSlug provided')
-        notFound()
+        setError('Form not found')
+        setIsLoading(false)
         return
       }
 
       try {
-        console.debug('[FormPageClient] Starting form fetch for slug:', formSlug)
         setIsLoading(true)
         setError(null)
         
         const response = await apiService.getFormBySlug(formSlug)
-        console.debug('[FormPageClient] getFormBySlug response:', {
-          success: response.success,
-          status: response.status,
-          hasData: !!response.data,
-          message: response.message
-        })
         
         if (response.success && response.data) {
-          const formData = response.data.data.form
-          console.debug('[FormPageClient] Form loaded successfully:', {
-            title: formData.title,
-            slug: formData.slug,
-            id: formData.id
-          })
-          setForm(formData)
+          setForm(response.data)
         } else {
-          console.debug('[FormPageClient] Form fetch failed:', {
-            message: response.message,
-            status: response.status,
-            hasData: !!response.data
-          })
-          
-          // If it's a "not found" type error, show 404
-          if (response.status === 404 ||
-              response.message?.toLowerCase().includes('not found') || 
-              response.message?.toLowerCase().includes('404') ||
-              !response.data) {
-            console.debug('[FormPageClient] Treating as 404 - calling notFound()')
-            notFound()
-            return
-          }
-          // Otherwise it's a server/network error, show error UI
-          console.debug('[FormPageClient] Treating as server error - showing error UI')
-          setError(response.message || 'Server error occurred')
-          toast.error(response.message || 'Server error occurred')
+          setError(response.message || 'Form not found')
+          toast.error(response.message || 'Form not found')
         }
       } catch (err) {
         const errorMessage = 'Failed to load form. Please check your connection and try again.'
-        console.debug('[FormPageClient] Exception in fetchForm:', {
-          error: err,
-          message: errorMessage,
-          formSlug
-        })
         setError(errorMessage)
         toast.error(errorMessage)
         console.error('Error fetching form:', err)
       } finally {
-        console.debug('[FormPageClient] fetchForm completed, setting loading to false')
         setIsLoading(false)
       }
     }
 
-    console.debug('[FormPageClient] useEffect triggered with formSlug:', formSlug)
     fetchForm()
   }, [formSlug])
 
@@ -99,31 +61,32 @@ export default function FormPageClient() {
     )
   }
 
-  // Only show error UI for actual server/network errors, not "not found" cases
-  if (error) {
+  if (error || !form) {
     return (
       <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="text-center space-y-4 max-w-md">
           <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
-          <h2 className="text-lg font-semibold text-gray-900">Server Error</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Form Not Found</h2>
           <p className="text-sm text-gray-600">
-            {error}
+            {error || 'The requested form could not be found. Please check the URL and try again.'}
           </p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Try Again
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/form">
+              <Button variant="outline" className="w-full sm:w-auto">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Forms
+              </Button>
+            </Link>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
       </main>
     )
-  }
-
-  // If form is null at this point, it means we couldn't load it - show 404
-  if (!form) {
-    notFound()
-    return null
   }
 
   return (

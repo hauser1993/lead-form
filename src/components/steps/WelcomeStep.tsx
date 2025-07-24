@@ -63,7 +63,7 @@ export default function WelcomeStep({ onValidationChange, onStart, form, t = (ke
           <TrendingUp className="w-10 h-10 text-white" />
         </div>
         <h2 className="text-3xl font-bold text-gray-900">
-          {form?.title || t('welcome.title')}
+          {form?.title ? `${t('welcome.titleForm')} ${form.title}!` : t('welcome.title')}
         </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           {form?.description || t('welcome.description')}
