@@ -38,7 +38,7 @@ interface Transaction {
   uploadError?: string
 }
 
-export default function AssetInfoStep({ formData, updateFormData, onValidationChange }: AssetInfoStepProps) {
+export default function AssetInfoStep({ formData, updateFormData, onValidationChange, t = (key, fallback) => fallback || key }: AssetInfoStepProps) {
   const [transactions, setTransactions] = useState<Transaction[]>(formData.assets || [])
 
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
           transaction.id === id ? { 
             ...transaction, 
             uploadStatus: 'error',
-            uploadError: response.message || 'Upload failed'
+            uploadError: response.message || t('assets.uploadFailed')
           } : transaction
         ))
       }
@@ -144,7 +144,7 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
         transaction.id === id ? { 
           ...transaction, 
           uploadStatus: 'error',
-          uploadError: 'Upload failed. Please try again.'
+          uploadError: t('assets.uploadFailed') + '. Please try again.'
         } : transaction
       ))
     }
@@ -180,14 +180,14 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
         <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
           <PieChart className="w-8 h-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">Asset Information</h2>
-        <p className="text-gray-600">Please provide details about your investment transactions</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('assets.title')}</h2>
+        <p className="text-gray-600">{t('assets.subtitle')}</p>
       </div>
 
       <div className="space-y-6 mt-8">
         {/* Transactions Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Investment Transactions</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('assets.transactionsTitle')}</h3>
           <Button
             type="button"
             onClick={addTransaction}
@@ -196,7 +196,7 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
             className="flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Transaction</span>
+            <span>{t('assets.addTransaction')}</span>
           </Button>
         </div>
 
@@ -207,11 +207,11 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
               <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <FileText className="w-8 h-8 text-gray-400" />
               </div>
-              <h4 className="text-lg font-medium text-gray-900 mb-2">No Transactions Added</h4>
-              <p className="text-gray-600 mb-4">Add your first investment transaction to get started</p>
+              <h4 className="text-lg font-medium text-gray-900 mb-2">{t('assets.noTransactions')}</h4>
+              <p className="text-gray-600 mb-4">{t('assets.noTransactionsDescription')}</p>
               <Button onClick={addTransaction} className="flex items-center space-x-2">
                 <Plus className="w-4 h-4" />
-                <span>Add Transaction</span>
+                <span>{t('assets.addTransaction')}</span>
               </Button>
             </CardContent>
           </Card>
@@ -222,7 +222,7 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-md font-medium text-gray-900">
-                      Transaction #{index + 1}
+                      {t('assets.transactionNumber')}{index + 1}
                     </h4>
                     <Button
                       type="button"
@@ -239,7 +239,7 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                     {/* Transaction Date */}
                     <div className="space-y-2">
                       <Label htmlFor={`date-${transaction.id}`} className="text-sm font-medium text-gray-700">
-                        Transaction Date *
+                        {t('assets.transactionDate')} {t('required')}
                       </Label>
                       <div className="relative">
                         <Input
@@ -257,13 +257,13 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                     {/* Quantity */}
                     <div className="space-y-2">
                       <Label htmlFor={`quantity-${transaction.id}`} className="text-sm font-medium text-gray-700">
-                        Quantity *
+                        {t('assets.quantity')} {t('required')}
                       </Label>
                       <div className="relative">
                         <Input
                           id={`quantity-${transaction.id}`}
                           type="text"
-                          placeholder="z. B. 100"
+                          placeholder={t('assets.quantity.placeholder')}
                           value={transaction.quantity}
                           onChange={(e) => {
                             // Remove formatting for internal state
@@ -284,13 +284,13 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                     {/* Price */}
                     <div className="space-y-2">
                       <Label htmlFor={`price-${transaction.id}`} className="text-sm font-medium text-gray-700">
-                        Price per Unit (€) *
+                        {t('assets.price')} {t('required')}
                       </Label>
                       <div className="relative">
                         <Input
                           id={`price-${transaction.id}`}
                           type="text"
-                          placeholder="z. B. 25,50"
+                          placeholder={t('assets.price.placeholder')}
                           value={transaction.price}
                           onChange={(e) => {
                             // Remove formatting for internal state
@@ -311,7 +311,7 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                     {/* Total Value (Calculated) */}
                     <div className="space-y-2">
                       <Label className="text-sm font-medium text-gray-700">
-                        Total Value
+                        {t('assets.totalValue')}
                       </Label>
                       <div className="h-12 flex items-center px-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600">
                         {transaction.quantity && transaction.price
@@ -326,11 +326,11 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                     {/* Notice */}
                     <div className="space-y-2">
                       <Label htmlFor={`notice-${transaction.id}`} className="text-sm font-medium text-gray-700">
-                        Notes <span className="text-gray-400">(Optional)</span>
+                        {t('assets.notes')} <span className="text-gray-400">{t('address.optional')}</span>
                       </Label>
                       <Textarea
                         id={`notice-${transaction.id}`}
-                        placeholder="Add any additional notes about this transaction..."
+                        placeholder={t('assets.notes.placeholder')}
                         value={transaction.notice}
                         onChange={(e) => updateTransaction(transaction.id, 'notice', e.target.value)}
                         className="min-h-[80px] resize-none"
@@ -342,7 +342,7 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                     <div className="space-y-2">
                       <Label className="text-sm font-medium text-gray-700 flex items-center space-x-2">
                         <Upload className="w-4 h-4" />
-                        <span>Proof Document <span className="text-gray-400">(Optional)</span></span>
+                        <span>{t('assets.proofDocument')} <span className="text-gray-400">{t('address.optional')}</span></span>
                       </Label>
                       
                       {/* Uploaded Files List */}
@@ -371,7 +371,7 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                                   rel="noopener noreferrer"
                                   className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 transition-colors"
                                 >
-                                  View
+                                  {t('assets.view')}
                                 </a>
                                 <Button
                                   type="button"
@@ -397,7 +397,7 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                               <p className="text-sm font-medium text-blue-900">
                                 {transaction.proofFile?.name}
                               </p>
-                              <p className="text-xs text-blue-600">Uploading...</p>
+                              <p className="text-xs text-blue-600">{t('assets.uploading')}</p>
                             </div>
                           </div>
                         </div>
@@ -410,10 +410,10 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                             <AlertCircle className="w-4 h-4 text-red-500" />
                             <div className="flex-1">
                               <p className="text-sm font-medium text-red-900">
-                                {transaction.proofFile?.name || 'Upload failed'}
+                                {transaction.proofFile?.name || t('assets.uploadFailed')}
                               </p>
                               <p className="text-xs text-red-600">
-                                {transaction.uploadError || 'Upload failed'}
+                                {transaction.uploadError || t('assets.uploadFailed')}
                               </p>
                             </div>
                           </div>
@@ -435,7 +435,7 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
                           id={`proof-${transaction.id}`}
                           onFileSelect={(file) => updateTransactionFile(transaction.id, file)}
                           selectedFile={transaction.proofFile}
-                          placeholder={transaction.uploadedFiles && transaction.uploadedFiles.length > 0 ? "Upload additional proof document" : "Upload transaction proof"}
+                          placeholder={transaction.uploadedFiles && transaction.uploadedFiles.length > 0 ? t('assets.uploadAdditional') : t('assets.uploadProof')}
                           maxSize={10}
                           accept=".pdf,.jpg,.jpeg,.png"
                         />
@@ -454,13 +454,13 @@ export default function AssetInfoStep({ formData, updateFormData, onValidationCh
       <div className="mt-8 space-y-3">
         <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
           <p className="text-sm text-purple-800">
-            <strong>📊 Investment Data:</strong> Please provide accurate transaction details for proper portfolio assessment and compliance verification.
+            <strong>📊 {t('assets.investmentNotice')}</strong> {t('assets.investmentDescription')}
           </p>
         </div>
 
         <div className="p-4 bg-green-50 rounded-lg border border-green-100">
           <p className="text-sm text-green-800">
-            <strong>📁 File Upload:</strong> Proof documents are securely uploaded to the server and permanently stored. You can view uploaded files using the "View file" link that appears after successful upload.
+            <strong>📁 {t('assets.fileUploadNotice')}</strong> {t('assets.fileUploadDescription')}
           </p>
         </div>
       </div>

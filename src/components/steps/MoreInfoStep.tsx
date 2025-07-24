@@ -17,7 +17,7 @@ interface MoreInfoStepProps {
   t?: (key: string, fallback?: string) => string
 }
 
-export default function MoreInfoStep({ formData, updateFormData, onValidationChange }: MoreInfoStepProps) {
+export default function MoreInfoStep({ formData, updateFormData, onValidationChange, t = (key, fallback) => fallback || key }: MoreInfoStepProps) {
 
   useEffect(() => {
     const isValid = formData.addressLine1.trim() !== '' &&
@@ -35,18 +35,18 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
   }
 
   const countryOptions = [
-    { value: 'germany', label: 'Germany' },
-    { value: 'austria', label: 'Austria' },
-    { value: 'switzerland', label: 'Switzerland' },
-    { value: 'france', label: 'France' },
-    { value: 'belgium', label: 'Belgium' },
-    { value: 'united-kingdom', label: 'United Kingdom' }, 
-    { value: 'netherlands', label: 'Netherlands' }, 
-    { value: 'ireland', label: 'Ireland' }, 
-    { value: 'luxembourg', label: 'Luxembourg' }, 
-    { value: 'poland', label: 'Poland' }, 
-    { value: 'spain', label: 'Spain' },
-    { value: 'sweden', label: 'Sweden' },
+    { value: 'germany', label: t('country.germany') },
+    { value: 'austria', label: t('country.austria') },
+    { value: 'switzerland', label: t('country.switzerland') },
+    { value: 'france', label: t('country.france') },
+    { value: 'belgium', label: t('country.belgium') },
+    { value: 'united-kingdom', label: t('country.unitedKingdom') }, 
+    { value: 'netherlands', label: t('country.netherlands') }, 
+    { value: 'ireland', label: t('country.ireland') }, 
+    { value: 'luxembourg', label: t('country.luxembourg') }, 
+    { value: 'poland', label: t('country.poland') }, 
+    { value: 'spain', label: t('country.spain') },
+    { value: 'sweden', label: t('country.sweden') },
   ]
 
   return (
@@ -55,20 +55,20 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
         <div className="w-16 h-16 mx-auto bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center">
           <MapPin className="w-8 h-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">Address Information</h2>
-        <p className="text-gray-600">Please provide your residential address details</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('address.title')}</h2>
+        <p className="text-gray-600">{t('address.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 mt-8">
         <div className="space-y-2">
           <Label htmlFor="addressLine1" className="text-sm font-medium text-gray-700">
-            Address Line 1 *
+            {t('address.line1')} {t('required')}
           </Label>
           <div className="relative">
             <Input
               id="addressLine1"
               type="text"
-              placeholder="Enter your street address"
+              placeholder={t('address.line1.placeholder')}
               value={formData.addressLine1}
               onChange={(e) => handleInputChange('addressLine1', e.target.value)}
               className="pl-10"
@@ -79,13 +79,13 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
 
         <div className="space-y-2">
           <Label htmlFor="addressLine2" className="text-sm font-medium text-gray-700">
-            Address Line 2 <span className="text-gray-400">(Optional)</span>
+            {t('address.line2')} <span className="text-gray-400">{t('address.optional')}</span>
           </Label>
           <div className="relative">
             <Input
               id="addressLine2"
               type="text"
-              placeholder="Apartment, suite, unit, building, floor, etc."
+              placeholder={t('address.line2.placeholder')}
               value={formData.addressLine2}
               onChange={(e) => handleInputChange('addressLine2', e.target.value)}
               className="pl-10"
@@ -97,13 +97,13 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="city" className="text-sm font-medium text-gray-700">
-              City *
+              {t('address.city')} {t('required')}
             </Label>
             <div className="relative">
               <Input
                 id="city"
                 type="text"
-                placeholder="Enter your city"
+                placeholder={t('address.city.placeholder')}
                 value={formData.city}
                 onChange={(e) => handleInputChange('city', e.target.value)}
                 className="pl-10"
@@ -114,13 +114,13 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
 
           <div className="space-y-2">
             <Label htmlFor="state" className="text-sm font-medium text-gray-700">
-              State/Province *
+              {t('address.state')} {t('required')}
             </Label>
             <div className="relative">
               <Input
                 id="state"
                 type="text"
-                placeholder="Enter your state or province"
+                placeholder={t('address.state.placeholder')}
                 value={formData.state}
                 onChange={(e) => handleInputChange('state', e.target.value)}
                 className="pl-10"
@@ -133,13 +133,13 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
-              Postal/ZIP Code *
+              {t('address.postalCode')} {t('required')}
             </Label>
             <div className="relative">
               <Input
                 id="postalCode"
                 type="text"
-                placeholder="Enter your postal or ZIP code"
+                placeholder={t('address.postalCode.placeholder')}
                 value={formData.postalCode}
                 onChange={(e) => handleInputChange('postalCode', e.target.value)}
                 className="pl-10"
@@ -150,7 +150,7 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
 
           <div className="space-y-2">
             <Label htmlFor="country" className="text-sm font-medium text-gray-700">
-              Country *
+              {t('address.country')} {t('required')}
             </Label>
             <SelectWithAutocomplete 
               name="country"
@@ -158,12 +158,12 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
               value={formData.country} 
               onValueChange={(value) => handleInputChange('country', value)}
               options={countryOptions}
-              placeholder="Select your country"
+              placeholder={t('address.country.placeholder')}
             >
               <SelectTrigger className="w-full">
                 <div className="flex items-center space-x-2">
                   <Globe className="w-4 h-4 text-gray-400" />
-                  <SelectValue placeholder="Select your country" />
+                  <SelectValue placeholder={t('address.country.placeholder')} />
                 </div>
               </SelectTrigger>
               <SelectContent>
@@ -180,7 +180,7 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
 
       <div className="mt-8 p-4 bg-green-50 rounded-lg border border-green-100">
         <p className="text-sm text-green-800">
-          <strong>📍 Address Verification:</strong> This address will be used for identity verification and compliance purposes. Please ensure all details are accurate.
+          <strong>📍 {t('address.verificationNotice')}</strong> {t('address.verificationDescription')}
         </p>
       </div>
     </div>

@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ChevronLeft, ChevronRight, Check, Loader2, Wifi, WifiOff, Save, AlertTriangle, Trash2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Check, Loader2, Wifi, WifiOff, Save, AlertTriangle, Trash2, Globe } from 'lucide-react'
 import { toast } from 'sonner'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import WelcomeStep from './steps/WelcomeStep'
 import PersonalInfoStep from './steps/PersonalInfoStep'
 import MoreInfoStep from './steps/MoreInfoStep'
@@ -66,6 +67,191 @@ const translations: Translations = {
   'time.oneMinute': { en: '1 minute ago', de: 'vor 1 Minute' },
   'time.minutes': { en: 'minutes ago', de: 'Minuten' },
   'time.saved': { en: 'Saved', de: 'Gespeichert' },
+
+  // Welcome Step
+  'welcome.title': { en: 'Welcome to Your Investment Journey!', de: 'Willkommen zu Ihrer Investitionsreise!' },
+  'welcome.titleForm': { en: 'Welcome to', de: 'Willkommen bei' },
+  'welcome.description': { en: 'Thank you for your interest in investing with us. This quick onboarding process will collect the necessary information to get your investment account set up.', de: 'Vielen Dank für Ihr Interesse, bei uns zu investieren. Dieser schnelle Onboarding-Prozess sammelt die notwendigen Informationen, um Ihr Investmentkonto einzurichten.' },
+  'welcome.feature.investment.title': { en: 'Investment Opportunities', de: 'Investitionsmöglichkeiten' },
+  'welcome.feature.investment.description': { en: 'Access exclusive investment deals and growth potential', de: 'Zugang zu exklusiven Investitionsgeschäften und Wachstumspotential' },
+  'welcome.feature.security.title': { en: 'Secure & Compliant', de: 'Sicher & Konform' },
+  'welcome.feature.security.description': { en: 'Bank-level security with full regulatory compliance', de: 'Bankensicherheit mit vollständiger regulatorischer Compliance' },
+  'welcome.feature.portfolio.title': { en: 'Portfolio Growth', de: 'Portfolio-Wachstum' },
+  'welcome.feature.portfolio.description': { en: 'Diversify your portfolio with our curated investments', de: 'Diversifizieren Sie Ihr Portfolio mit unseren kuratierten Investitionen' },
+  'welcome.feature.support.title': { en: 'Expert Support', de: 'Expertenunterstützung' },
+  'welcome.feature.support.description': { en: 'Dedicated team to guide your investment journey', de: 'Engagiertes Team, das Sie auf Ihrer Investitionsreise begleitet' },
+  'welcome.timeNotice': { en: 'Takes just 5-7 minutes', de: 'Dauert nur 5-7 Minuten' },
+  'welcome.securityNotice': { en: 'Your information is encrypted and protected according to financial industry standards.', de: 'Ihre Informationen sind verschlüsselt und gemäß Finanzbranchenstandards geschützt.' },
+  'welcome.needNotice': { en: 'What You\'ll Need:', de: 'Was Sie benötigen:' },
+  'welcome.needDescription': { en: 'Personal information, address details, and identification for verification purposes.', de: 'Persönliche Informationen, Adressdaten und Identifikation für Verifizierungszwecke.' },
+  'welcome.getStarted': { en: 'Get Started', de: 'Loslegen' },
+
+  // Personal Info Step
+  'personal.title': { en: 'Personal Information', de: 'Persönliche Informationen' },
+  'personal.subtitle': { en: 'Please provide your basic personal details', de: 'Bitte geben Sie Ihre grundlegenden persönlichen Daten an' },
+  'personal.gender': { en: 'Gender', de: 'Geschlecht' },
+  'personal.gender.placeholder': { en: 'Select your gender', de: 'Wählen Sie Ihr Geschlecht' },
+  'personal.firstName': { en: 'First Name', de: 'Vorname' },
+  'personal.firstName.placeholder': { en: 'Enter your first name', de: 'Geben Sie Ihren Vornamen ein' },
+  'personal.lastName': { en: 'Last Name', de: 'Nachname' },
+  'personal.lastName.placeholder': { en: 'Enter your last name', de: 'Geben Sie Ihren Nachnamen ein' },
+  'personal.birthdate': { en: 'Date of Birth', de: 'Geburtsdatum' },
+  'personal.nationality': { en: 'Nationality', de: 'Staatsangehörigkeit' },
+  'personal.nationality.placeholder': { en: 'Select your nationality', de: 'Wählen Sie Ihre Staatsangehörigkeit' },
+  'personal.email': { en: 'Email Address', de: 'E-Mail-Adresse' },
+  'personal.email.placeholder': { en: 'Enter your email address', de: 'Geben Sie Ihre E-Mail-Adresse ein' },
+  'personal.phone': { en: 'Phone Number', de: 'Telefonnummer' },
+  'personal.phone.placeholder': { en: 'Enter your phone number', de: 'Geben Sie Ihre Telefonnummer ein' },
+  'personal.privacyNotice': { en: 'Privacy Notice:', de: 'Datenschutzhinweis:' },
+  'personal.privacyDescription': { en: 'Your personal information is securely encrypted and will only be used for account verification and investment processing purposes.', de: 'Ihre persönlichen Informationen sind sicher verschlüsselt und werden nur für Kontoverifizierung und Investitionsverarbeitungszwecke verwendet.' },
+
+  // Gender options
+  'gender.male': { en: 'Male', de: 'Männlich' },
+  'gender.female': { en: 'Female', de: 'Weiblich' },
+  'gender.other': { en: 'Other', de: 'Andere' },
+  'gender.preferNotToSay': { en: 'Prefer not to say', de: 'Möchte nicht angeben' },
+
+  // Nationality options
+  'nationality.german': { en: 'German', de: 'Deutsch' },
+  'nationality.austrian': { en: 'Austrian', de: 'Österreichisch' },
+  'nationality.swiss': { en: 'Swiss', de: 'Schweizerisch' },
+  'nationality.french': { en: 'French', de: 'Französisch' },
+  'nationality.belgian': { en: 'Belgian', de: 'Belgisch' },
+  'nationality.british': { en: 'British', de: 'Britisch' },
+  'nationality.dutch': { en: 'Dutch', de: 'Niederländisch' },
+  'nationality.irish': { en: 'Irish', de: 'Irisch' },
+  'nationality.luxembourgish': { en: 'Luxembourgish', de: 'Luxemburgisch' },
+  'nationality.polish': { en: 'Polish', de: 'Polnisch' },
+  'nationality.spanish': { en: 'Spanish', de: 'Spanisch' },
+  'nationality.swedish': { en: 'Swedish', de: 'Schwedisch' },
+
+  // Address Step
+  'address.title': { en: 'Address Information', de: 'Adressinformationen' },
+  'address.subtitle': { en: 'Please provide your residential address details', de: 'Bitte geben Sie Ihre Wohnadresse an' },
+  'address.line1': { en: 'Address Line 1', de: 'Adresszeile 1' },
+  'address.line1.placeholder': { en: 'Enter your street address', de: 'Geben Sie Ihre Straßenadresse ein' },
+  'address.line2': { en: 'Address Line 2', de: 'Adresszeile 2' },
+  'address.line2.placeholder': { en: 'Apartment, suite, unit, building, floor, etc.', de: 'Wohnung, Suite, Einheit, Gebäude, Etage, etc.' },
+  'address.city': { en: 'City', de: 'Stadt' },
+  'address.city.placeholder': { en: 'Enter your city', de: 'Geben Sie Ihre Stadt ein' },
+  'address.state': { en: 'State/Province', de: 'Staat/Provinz' },
+  'address.state.placeholder': { en: 'Enter your state or province', de: 'Geben Sie Ihren Staat oder Ihre Provinz ein' },
+  'address.postalCode': { en: 'Postal/ZIP Code', de: 'Postleitzahl' },
+  'address.postalCode.placeholder': { en: 'Enter your postal or ZIP code', de: 'Geben Sie Ihre Postleitzahl ein' },
+  'address.country': { en: 'Country', de: 'Land' },
+  'address.country.placeholder': { en: 'Select your country', de: 'Wählen Sie Ihr Land' },
+  'address.optional': { en: '(Optional)', de: '(Optional)' },
+  'address.verificationNotice': { en: 'Address Verification:', de: 'Adressverifizierung:' },
+  'address.verificationDescription': { en: 'This address will be used for identity verification and compliance purposes. Please ensure all details are accurate.', de: 'Diese Adresse wird für Identitätsverifizierung und Compliance-Zwecke verwendet. Bitte stellen Sie sicher, dass alle Details korrekt sind.' },
+
+  // Country options
+  'country.germany': { en: 'Germany', de: 'Deutschland' },
+  'country.austria': { en: 'Austria', de: 'Österreich' },
+  'country.switzerland': { en: 'Switzerland', de: 'Schweiz' },
+  'country.france': { en: 'France', de: 'Frankreich' },
+  'country.belgium': { en: 'Belgium', de: 'Belgien' },
+  'country.unitedKingdom': { en: 'United Kingdom', de: 'Vereinigtes Königreich' },
+  'country.netherlands': { en: 'Netherlands', de: 'Niederlande' },
+  'country.ireland': { en: 'Ireland', de: 'Irland' },
+  'country.luxembourg': { en: 'Luxembourg', de: 'Luxemburg' },
+  'country.poland': { en: 'Poland', de: 'Polen' },
+  'country.spain': { en: 'Spain', de: 'Spanien' },
+  'country.sweden': { en: 'Sweden', de: 'Schweden' },
+
+  // Asset Info Step
+  'assets.title': { en: 'Asset Information', de: 'Vermögensinformationen' },
+  'assets.subtitle': { en: 'Please provide details about your investment transactions', de: 'Bitte geben Sie Details zu Ihren Investitionstransaktionen an' },
+  'assets.transactionsTitle': { en: 'Investment Transactions', de: 'Investitionstransaktionen' },
+  'assets.addTransaction': { en: 'Add Transaction', de: 'Transaktion hinzufügen' },
+  'assets.noTransactions': { en: 'No Transactions Added', de: 'Keine Transaktionen hinzugefügt' },
+  'assets.noTransactionsDescription': { en: 'Add your first investment transaction to get started', de: 'Fügen Sie Ihre erste Investitionstransaktion hinzu, um zu beginnen' },
+  'assets.transactionNumber': { en: 'Transaction #', de: 'Transaktion #' },
+  'assets.transactionDate': { en: 'Transaction Date', de: 'Transaktionsdatum' },
+  'assets.quantity': { en: 'Quantity', de: 'Menge' },
+  'assets.quantity.placeholder': { en: 'e.g. 100', de: 'z. B. 100' },
+  'assets.price': { en: 'Price per Unit (€)', de: 'Preis pro Einheit (€)' },
+  'assets.price.placeholder': { en: 'e.g. 25.50', de: 'z. B. 25,50' },
+  'assets.totalValue': { en: 'Total Value', de: 'Gesamtwert' },
+  'assets.notes': { en: 'Notes', de: 'Notizen' },
+  'assets.notes.placeholder': { en: 'Add any additional notes about this transaction...', de: 'Fügen Sie weitere Notizen zu dieser Transaktion hinzu...' },
+  'assets.proofDocument': { en: 'Proof Document', de: 'Nachweisdokument' },
+  'assets.uploading': { en: 'Uploading...', de: 'Wird hochgeladen...' },
+  'assets.uploadFailed': { en: 'Upload failed', de: 'Upload fehlgeschlagen' },
+  'assets.uploadAdditional': { en: 'Upload additional proof document', de: 'Zusätzliches Nachweisdokument hochladen' },
+  'assets.uploadProof': { en: 'Upload transaction proof', de: 'Transaktionsnachweis hochladen' },
+  'assets.view': { en: 'View', de: 'Anzeigen' },
+  'assets.investmentNotice': { en: 'Investment Data:', de: 'Investitionsdaten:' },
+  'assets.investmentDescription': { en: 'Please provide accurate transaction details for proper portfolio assessment and compliance verification.', de: 'Bitte geben Sie genaue Transaktionsdetails für eine ordnungsgemäße Portfoliobewertung und Compliance-Verifizierung an.' },
+  'assets.fileUploadNotice': { en: 'File Upload:', de: 'Datei-Upload:' },
+  'assets.fileUploadDescription': { en: 'Proof documents are securely uploaded to the server and permanently stored. You can view uploaded files using the "View file" link that appears after successful upload.', de: 'Nachweisdokumente werden sicher auf den Server hochgeladen und dauerhaft gespeichert. Sie können hochgeladene Dateien über den "Datei anzeigen"-Link anzeigen, der nach erfolgreichem Upload erscheint.' },
+
+  // Legal Step
+  'legal.title': { en: 'Legal Agreements', de: 'Rechtliche Vereinbarungen' },
+  'legal.subtitle': { en: 'Please review and accept our terms to continue', de: 'Bitte überprüfen und akzeptieren Sie unsere Bedingungen, um fortzufahren' },
+  'legal.termsTitle': { en: 'Terms of Service', de: 'Nutzungsbedingungen' },
+  'legal.termsAccept': { en: 'I have read and accept the Terms of Service', de: 'Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie' },
+  'legal.fullTerms': { en: 'Full Terms', de: 'Vollständige Bedingungen' },
+  'legal.privacyTitle': { en: 'Privacy Policy', de: 'Datenschutzrichtlinie' },
+  'legal.privacyAccept': { en: 'I have read and accept the Privacy Policy', de: 'Ich habe die Datenschutzrichtlinie gelesen und akzeptiere sie' },
+  'legal.fullPolicy': { en: 'Full Policy', de: 'Vollständige Richtlinie' },
+  'legal.marketingTitle': { en: 'Marketing Communications', de: 'Marketing-Kommunikation' },
+  'legal.marketingDescription': { en: 'Stay informed about new investment opportunities, market insights, and platform updates.', de: 'Bleiben Sie über neue Investitionsmöglichkeiten, Markteinblicke und Plattform-Updates informiert.' },
+  'legal.marketingAccept': { en: 'I consent to receiving marketing communications via email and SMS (Optional)', de: 'Ich stimme dem Erhalt von Marketing-Kommunikation per E-Mail und SMS zu (Optional)' },
+  'legal.marketingUnsubscribe': { en: 'You can unsubscribe at any time. This does not affect important account notifications.', de: 'Sie können sich jederzeit abmelden. Dies betrifft keine wichtigen Kontobenachrichtigungen.' },
+  'legal.notice': { en: 'Legal Notice:', de: 'Rechtlicher Hinweis:' },
+  'legal.noticeDescription': { en: 'These agreements are legally binding. Please review them carefully. Contact our legal team if you have any questions before proceeding.', de: 'Diese Vereinbarungen sind rechtlich bindend. Bitte prüfen Sie sie sorgfältig. Kontaktieren Sie unser Rechtsteam, wenn Sie Fragen haben, bevor Sie fortfahren.' },
+
+  // Terms of Service content
+  'terms.acceptance': { en: 'Acceptance of Terms', de: 'Annahme der Bedingungen' },
+  'terms.acceptanceText': { en: 'By using our investment platform, you agree to be bound by these Terms of Service and all applicable laws and regulations.', de: 'Durch die Nutzung unserer Investitionsplattform stimmen Sie zu, an diese Nutzungsbedingungen und alle anwendbaren Gesetze und Vorschriften gebunden zu sein.' },
+  'terms.risks': { en: 'Investment Risks', de: 'Investitionsrisiken' },
+  'terms.risksText': { en: 'All investments carry risk of loss. Past performance does not guarantee future results. You should carefully consider your investment objectives and risk tolerance.', de: 'Alle Investitionen bergen Verlustrisiken. Vergangene Performance garantiert keine zukünftigen Ergebnisse. Sie sollten Ihre Investitionsziele und Risikobereitschaft sorgfältig überdenken.' },
+  'terms.eligibility': { en: 'Eligibility', de: 'Berechtigung' },
+  'terms.eligibilityText': { en: 'You must be at least 18 years old and legally capable of entering into binding agreements to use our services.', de: 'Sie müssen mindestens 18 Jahre alt und rechtlich in der Lage sein, bindende Vereinbarungen einzugehen, um unsere Dienste zu nutzen.' },
+  'terms.responsibilities': { en: 'Account Responsibilities', de: 'Kontoverantwortlichkeiten' },
+  'terms.responsibilitiesText': { en: 'You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.', de: 'Sie sind verantwortlich für die Vertraulichkeit Ihrer Kontodaten und für alle Aktivitäten unter Ihrem Konto.' },
+  'terms.compliance': { en: 'Compliance', de: 'Compliance' },
+  'terms.complianceText': { en: 'You agree to comply with all applicable securities laws and regulations in your jurisdiction.', de: 'Sie stimmen zu, alle anwendbaren Wertpapiergesetze und -vorschriften in Ihrer Gerichtsbarkeit einzuhalten.' },
+  'terms.liability': { en: 'Limitation of Liability', de: 'Haftungsbeschränkung' },
+  'terms.liabilityText': { en: 'Our liability is limited to the maximum extent permitted by law. We are not liable for market losses or investment performance.', de: 'Unsere Haftung ist auf das gesetzlich zulässige Maximum beschränkt. Wir haften nicht für Marktverluste oder Investitionsperformance.' },
+
+  // Privacy Policy content
+  'privacy.collection': { en: 'Information Collection', de: 'Informationssammlung' },
+  'privacy.collectionText': { en: 'We collect personal information necessary for account verification, compliance, and service provision including name, address, financial information, and identification documents.', de: 'Wir sammeln persönliche Informationen, die für Kontoverifizierung, Compliance und Diensterbringung notwendig sind, einschließlich Name, Adresse, Finanzinformationen und Identifikationsdokumente.' },
+  'privacy.usage': { en: 'Data Usage', de: 'Datennutzung' },
+  'privacy.usageText': { en: 'Your information is used for account management, regulatory compliance, fraud prevention, and to provide investment services.', de: 'Ihre Informationen werden für Kontoverwaltung, regulatorische Compliance, Betrugsprävention und zur Bereitstellung von Investitionsdienstleistungen verwendet.' },
+  'privacy.protection': { en: 'Data Protection', de: 'Datenschutz' },
+  'privacy.protectionText': { en: 'We employ industry-standard security measures including encryption, secure servers, and access controls to protect your personal information.', de: 'Wir verwenden branchenübliche Sicherheitsmaßnahmen einschließlich Verschlüsselung, sichere Server und Zugangskontrollen zum Schutz Ihrer persönlichen Informationen.' },
+  'privacy.sharing': { en: 'Information Sharing', de: 'Informationsaustausch' },
+  'privacy.sharingText': { en: 'We may share information with regulatory authorities, service providers, and as required by law. We do not sell personal information to third parties.', de: 'Wir können Informationen mit Regulierungsbehörden, Dienstleistern und wie gesetzlich vorgeschrieben teilen. Wir verkaufen keine persönlichen Informationen an Dritte.' },
+  'privacy.retention': { en: 'Data Retention', de: 'Datenaufbewahrung' },
+  'privacy.retentionText': { en: 'We retain your information as required by law and for legitimate business purposes. You may request data deletion subject to regulatory requirements.', de: 'Wir bewahren Ihre Informationen wie gesetzlich vorgeschrieben und für legitime Geschäftszwecke auf. Sie können die Löschung von Daten beantragen, vorbehaltlich regulatorischer Anforderungen.' },
+  'privacy.rights': { en: 'Your Rights', de: 'Ihre Rechte' },
+  'privacy.rightsText': { en: 'You have the right to access, correct, and request deletion of your personal information, subject to regulatory constraints.', de: 'Sie haben das Recht auf Zugang, Korrektur und Löschung Ihrer persönlichen Informationen, vorbehaltlich regulatorischer Beschränkungen.' },
+
+  // Confirmation Step
+  'confirmation.summaryTitle': { en: 'Application Summary', de: 'Antragsübersicht' },
+  'confirmation.personalInfo': { en: 'Personal Information', de: 'Persönliche Informationen' },
+  'confirmation.addressInfo': { en: 'Address Information', de: 'Adressinformationen' },
+  'confirmation.assetInfo': { en: 'Asset Information', de: 'Vermögensinformationen' },
+  'confirmation.legalInfo': { en: 'Legal Agreements', de: 'Rechtliche Vereinbarungen' },
+  'confirmation.name': { en: 'Name:', de: 'Name:' },
+  'confirmation.gender': { en: 'Gender:', de: 'Geschlecht:' },
+  'confirmation.email': { en: 'Email:', de: 'E-Mail:' },
+  'confirmation.phone': { en: 'Phone:', de: 'Telefon:' },
+  'confirmation.birthdate': { en: 'Birthdate:', de: 'Geburtsdatum:' },
+  'confirmation.nationality': { en: 'Nationality:', de: 'Staatsangehörigkeit:' },
+  'confirmation.address': { en: 'Address:', de: 'Adresse:' },
+  'confirmation.notSpecified': { en: 'Not specified', de: 'Nicht angegeben' },
+  'confirmation.transactions': { en: 'transactions', de: 'Transaktionen' },
+  'confirmation.termsAccepted': { en: 'Terms of Service accepted', de: 'Nutzungsbedingungen akzeptiert' },
+  'confirmation.privacyAccepted': { en: 'Privacy Policy accepted', de: 'Datenschutzrichtlinie akzeptiert' },
+  'confirmation.marketingConsent': { en: 'Marketing communications', de: 'Marketing-Kommunikation' },
+  'confirmation.agreed': { en: 'Agreed', de: 'Zugestimmt' },
+  'confirmation.declined': { en: 'Declined', de: 'Abgelehnt' },
+
+  // Required field indicator
+  'required': { en: '*', de: '*' },
 }
 
 // Cookie utilities
@@ -101,35 +287,54 @@ const useTranslation = (language: Language) => {
   return { t }
 }
 
-// Language Flag Component
-const LanguageFlag = ({ language, isActive, onClick }: { 
+// Language Dropdown Component
+const LanguageDropdown = ({ language, onChange }: { 
   language: Language
-  isActive: boolean
-  onClick: () => void
+  onChange: (language: Language) => void
 }) => {
-  const flags = {
-    en: '🇺🇸',
-    de: '🇩🇪'
-  }
-  
-  const labels = {
-    en: 'English',
-    de: 'Deutsch'
+  const languageOptions = [
+    { 
+      value: 'en' as Language, 
+      label: 'English',
+      flag: '🇺🇸'
+    },
+    { 
+      value: 'de' as Language, 
+      label: 'Deutsch',
+      flag: '🇩🇪'
+    }
+  ]
+
+  const currentOption = languageOptions.find(opt => opt.value === language)
+
+  const handleChange = (value: string) => {
+    if (value === 'en' || value === 'de') {
+      onChange(value as Language)
+    }
   }
 
   return (
-    <button
-      onClick={onClick}
-      className={`flex items-center space-x-1 px-2 py-1 rounded transition-all duration-200 ${
-        isActive 
-          ? 'bg-blue-100 text-blue-700 ring-1 ring-blue-300' 
-          : 'text-gray-600 hover:bg-gray-100'
-      }`}
-      title={labels[language]}
+    <Select 
+      value={language} 
+      onValueChange={handleChange}
     >
-      <span className="text-sm">{flags[language]}</span>
-      <span className="text-xs font-medium hidden sm:inline">{labels[language]}</span>
-    </button>
+      <SelectTrigger className="w-32 h-8 text-xs">
+        <div className="flex items-center space-x-2">
+          <span className="text-base">{currentOption?.flag}</span>
+          <span className="hidden sm:inline">{currentOption?.label}</span>
+        </div>
+      </SelectTrigger>
+      <SelectContent>
+        {languageOptions.map((option) => (
+          <SelectItem key={option.value} value={option.value}>
+            <div className="flex items-center space-x-2">
+              <span>{option.flag}</span>
+              <span>{option.label}</span>
+            </div>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }
 
@@ -784,18 +989,10 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
                 </div>
                 <div className="flex items-center space-x-2">
                   {/* Language Selector */}
-                  <div className="flex items-center space-x-1 border rounded-lg p-1">
-                    <LanguageFlag 
-                      language="en" 
-                      isActive={language === 'en'} 
-                      onClick={() => changeLanguage('en')} 
-                    />
-                    <LanguageFlag 
-                      language="de" 
-                      isActive={language === 'de'} 
-                      onClick={() => changeLanguage('de')} 
-                    />
-                  </div>
+                  <LanguageDropdown 
+                    language={language} 
+                    onChange={changeLanguage} 
+                  />
 
                   {/* Connectivity Status */}
                   <div className="flex items-center space-x-1">

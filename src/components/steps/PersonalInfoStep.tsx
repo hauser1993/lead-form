@@ -17,7 +17,7 @@ interface PersonalInfoStepProps {
   t?: (key: string, fallback?: string) => string
 }
 
-export default function PersonalInfoStep({ formData, updateFormData, onValidationChange }: PersonalInfoStepProps) {
+export default function PersonalInfoStep({ formData, updateFormData, onValidationChange, t = (key, fallback) => fallback || key }: PersonalInfoStepProps) {
 
   useEffect(() => {
     const isValid = formData.gender.trim() !== '' &&
@@ -37,25 +37,25 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
   }
 
   const genderOptions = [
-    { value: 'male', label: 'Male' },
-    { value: 'female', label: 'Female' },
-    { value: 'other', label: 'Other' },
-    { value: 'prefer-not-to-say', label: 'Prefer not to say' },
+    { value: 'male', label: t('gender.male') },
+    { value: 'female', label: t('gender.female') },
+    { value: 'other', label: t('gender.other') },
+    { value: 'prefer-not-to-say', label: t('gender.preferNotToSay') },
   ]
 
   const nationalityOptions = [
-    { value: 'german', label: 'German' },
-    { value: 'austrian', label: 'Austrian' },
-    { value: 'swiss', label: 'Swiss' },
-    { value: 'french', label: 'French' },
-    { value: 'belgian', label: 'Belgian' },
-    { value: 'british', label: 'British' }, 
-    { value: 'dutch', label: 'Dutch' }, 
-    { value: 'irish', label: 'Irish' }, 
-    { value: 'luxembourgish', label: 'Luxembourgish' }, 
-    { value: 'polish', label: 'Polish' }, 
-    { value: 'spanish', label: 'Spanish' },
-    { value: 'swedish', label: 'Swedish' },
+    { value: 'german', label: t('nationality.german') },
+    { value: 'austrian', label: t('nationality.austrian') },
+    { value: 'swiss', label: t('nationality.swiss') },
+    { value: 'french', label: t('nationality.french') },
+    { value: 'belgian', label: t('nationality.belgian') },
+    { value: 'british', label: t('nationality.british') }, 
+    { value: 'dutch', label: t('nationality.dutch') }, 
+    { value: 'irish', label: t('nationality.irish') }, 
+    { value: 'luxembourgish', label: t('nationality.luxembourgish') }, 
+    { value: 'polish', label: t('nationality.polish') }, 
+    { value: 'spanish', label: t('nationality.spanish') },
+    { value: 'swedish', label: t('nationality.swedish') },
   ]
 
   return (
@@ -64,14 +64,14 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
         <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
           <User className="w-8 h-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
-        <p className="text-gray-600">Please provide your basic personal details</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('personal.title')}</h2>
+        <p className="text-gray-600">{t('personal.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
-            Gender *
+            {t('personal.gender')} {t('required')}
           </Label>
           <SelectWithAutocomplete 
             name="gender"
@@ -79,12 +79,12 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
             value={formData.gender} 
             onValueChange={(value) => handleInputChange('gender', value)}
             options={genderOptions}
-            placeholder="Select your gender"
+            placeholder={t('personal.gender.placeholder')}
           >
             <SelectTrigger className="w-full">
               <div className="flex items-center space-x-2">
                 <UserCheck className="w-4 h-4 text-gray-400" />
-                <SelectValue placeholder="Select your gender" />
+                <SelectValue placeholder={t('personal.gender.placeholder')} />
               </div>
             </SelectTrigger>
             <SelectContent>
@@ -99,13 +99,13 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
 
         <div className="space-y-2">
           <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
-            First Name *
+            {t('personal.firstName')} {t('required')}
           </Label>
           <div className="relative">
             <Input
               id="firstName"
               type="text"
-              placeholder="Enter your first name"
+              placeholder={t('personal.firstName.placeholder')}
               value={formData.firstName}
               onChange={(e) => handleInputChange('firstName', e.target.value)}
               className="pl-10"
@@ -116,13 +116,13 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
 
         <div className="space-y-2">
           <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
-            Last Name *
+            {t('personal.lastName')} {t('required')}
           </Label>
           <div className="relative">
             <Input
               id="lastName"
               type="text"
-              placeholder="Enter your last name"
+              placeholder={t('personal.lastName.placeholder')}
               value={formData.lastName}
               onChange={(e) => handleInputChange('lastName', e.target.value)}
               className="pl-10"
@@ -133,7 +133,7 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
 
         <div className="space-y-2">
           <Label htmlFor="birthdate" className="text-sm font-medium text-gray-700">
-            Date of Birth *
+            {t('personal.birthdate')} {t('required')}
           </Label>
           <div className="relative">
             <Input
@@ -150,7 +150,7 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
 
         <div className="space-y-2">
           <Label htmlFor="nationality" className="text-sm font-medium text-gray-700">
-            Nationality *
+            {t('personal.nationality')} {t('required')}
           </Label>
           <SelectWithAutocomplete 
             name="nationality"
@@ -158,12 +158,12 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
             value={formData.nationality} 
             onValueChange={(value) => handleInputChange('nationality', value)}
             options={nationalityOptions}
-            placeholder="Select your nationality"
+            placeholder={t('personal.nationality.placeholder')}
           >
             <SelectTrigger className="w-full">
               <div className="flex items-center space-x-2">
                 <Globe className="w-4 h-4 text-gray-400" />
-                <SelectValue placeholder="Select your nationality" />
+                <SelectValue placeholder={t('personal.nationality.placeholder')} />
               </div>
             </SelectTrigger>
             <SelectContent>
@@ -178,13 +178,13 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
 
         <div className="space-y-2">
           <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-            Email Address *
+            {t('personal.email')} {t('required')}
           </Label>
           <div className="relative">
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email address"
+              placeholder={t('personal.email.placeholder')}
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
               className="pl-10"
@@ -195,13 +195,13 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
 
         <div className="space-y-2">
           <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
-            Phone Number *
+            {t('personal.phone')} {t('required')}
           </Label>
           <div className="relative">
             <Input
               id="phone"
               type="tel"
-              placeholder="Enter your phone number"
+              placeholder={t('personal.phone.placeholder')}
               value={formData.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
               className="pl-10"
@@ -213,7 +213,7 @@ export default function PersonalInfoStep({ formData, updateFormData, onValidatio
 
       <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
         <p className="text-sm text-blue-800">
-          <strong>🔒 Privacy Notice:</strong> Your personal information is securely encrypted and will only be used for account verification and investment processing purposes.
+          <strong>🔒 {t('personal.privacyNotice')}</strong> {t('personal.privacyDescription')}
         </p>
       </div>
     </div>

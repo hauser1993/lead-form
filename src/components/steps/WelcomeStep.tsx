@@ -25,7 +25,7 @@ interface WelcomeStepProps {
   t?: (key: string, fallback?: string) => string
 }
 
-export default function WelcomeStep({ onValidationChange, onStart, form }: WelcomeStepProps) {
+export default function WelcomeStep({ onValidationChange, onStart, form, t = (key, fallback) => fallback || key }: WelcomeStepProps) {
   useEffect(() => {
     // Welcome step is always valid
     onValidationChange(true)
@@ -36,23 +36,23 @@ export default function WelcomeStep({ onValidationChange, onStart, form }: Welco
   const features = [
     {
       icon: <TrendingUp className="w-6 h-6 text-green-500" />,
-      title: 'Investment Opportunities',
-      description: 'Access exclusive investment deals and growth potential'
+      title: t('welcome.feature.investment.title'),
+      description: t('welcome.feature.investment.description')
     },
     {
       icon: <Shield className="w-6 h-6 text-blue-500" />,
-      title: 'Secure & Compliant',
-      description: 'Bank-level security with full regulatory compliance'
+      title: t('welcome.feature.security.title'),
+      description: t('welcome.feature.security.description')
     },
     {
       icon: <DollarSign className="w-6 h-6 text-purple-500" />,
-      title: 'Portfolio Growth',
-      description: 'Diversify your portfolio with our curated investments'
+      title: t('welcome.feature.portfolio.title'),
+      description: t('welcome.feature.portfolio.description')
     },
     {
       icon: <Users className="w-6 h-6 text-orange-500" />,
-      title: 'Expert Support',
-      description: 'Dedicated team to guide your investment journey'
+      title: t('welcome.feature.support.title'),
+      description: t('welcome.feature.support.description')
     }
   ]
 
@@ -63,11 +63,10 @@ export default function WelcomeStep({ onValidationChange, onStart, form }: Welco
           <TrendingUp className="w-10 h-10 text-white" />
         </div>
         <h2 className="text-3xl font-bold text-gray-900">
-          {form?.title ? `Welcome to ${form.title}!` : 'Welcome to Your Investment Journey!'}
+          {form?.title ? `${t('welcome.titleForm')} ${form.title}!` : t('welcome.title')}
         </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          {form?.description || 
-            'Thank you for your interest in investing with us. This quick onboarding process will collect the necessary information to get your investment account set up.'}
+          {form?.description || t('welcome.description')}
         </p>
       </div>
 
@@ -90,13 +89,13 @@ export default function WelcomeStep({ onValidationChange, onStart, form }: Welco
 
       <div className="mt-8 p-4 bg-green-50 rounded-lg border border-green-100">
         <p className="text-sm text-green-800">
-          <strong>⏱️ Takes just 5-7 minutes</strong> - Your information is encrypted and protected according to financial industry standards.
+          <strong>⏱️ {t('welcome.timeNotice')}</strong> - {t('welcome.securityNotice')}
         </p>
       </div>
 
       <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
         <p className="text-sm text-blue-800">
-          <strong>📋 What You'll Need:</strong> Personal information, address details, and identification for verification purposes.
+          <strong>📋 {t('welcome.needNotice')}</strong> {t('welcome.needDescription')}
         </p>
       </div>
 
@@ -107,7 +106,7 @@ export default function WelcomeStep({ onValidationChange, onStart, form }: Welco
           size="lg"
           className="px-8 py-3 text-lg font-semibold bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
         >
-          Get Started
+          {t('welcome.getStarted')}
           <ArrowRight className="w-5 h-5 ml-2" />
         </Button>
       </div>

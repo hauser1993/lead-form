@@ -18,7 +18,7 @@ interface LegalStepProps {
   t?: (key: string, fallback?: string) => string
 }
 
-export default function LegalStep({ formData, updateFormData, onValidationChange }: LegalStepProps) {
+export default function LegalStep({ formData, updateFormData, onValidationChange, t = (key, fallback) => fallback || key }: LegalStepProps) {
 
   useEffect(() => {
     const isValid = formData.termsAccepted && formData.privacyAccepted
@@ -37,8 +37,8 @@ export default function LegalStep({ formData, updateFormData, onValidationChange
         <div className="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
           <Scale className="w-8 h-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">Legal Agreements</h2>
-        <p className="text-gray-600">Please review and accept our terms to continue</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('legal.title')}</h2>
+        <p className="text-gray-600">{t('legal.subtitle')}</p>
       </div>
 
       <div className="space-y-6 mt-8">
@@ -47,26 +47,26 @@ export default function LegalStep({ formData, updateFormData, onValidationChange
           <div className="flex items-start space-x-4">
             <FileText className="w-6 h-6 text-blue-500 mt-1 flex-shrink-0" />
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Terms of Service</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('legal.termsTitle')}</h3>
               <div className="bg-gray-50 rounded-lg p-4 max-h-48 overflow-y-auto border text-sm text-gray-700 leading-relaxed">
                 <div className="space-y-3">
-                  <p><strong>1. Acceptance of Terms</strong></p>
-                  <p>By using our investment platform, you agree to be bound by these Terms of Service and all applicable laws and regulations.</p>
+                  <p><strong>1. {t('terms.acceptance')}</strong></p>
+                  <p>{t('terms.acceptanceText')}</p>
 
-                  <p><strong>2. Investment Risks</strong></p>
-                  <p>All investments carry risk of loss. Past performance does not guarantee future results. You should carefully consider your investment objectives and risk tolerance.</p>
+                  <p><strong>2. {t('terms.risks')}</strong></p>
+                  <p>{t('terms.risksText')}</p>
 
-                  <p><strong>3. Eligibility</strong></p>
-                  <p>You must be at least 18 years old and legally capable of entering into binding agreements to use our services.</p>
+                  <p><strong>3. {t('terms.eligibility')}</strong></p>
+                  <p>{t('terms.eligibilityText')}</p>
 
-                  <p><strong>4. Account Responsibilities</strong></p>
-                  <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.</p>
+                  <p><strong>4. {t('terms.responsibilities')}</strong></p>
+                  <p>{t('terms.responsibilitiesText')}</p>
 
-                  <p><strong>5. Compliance</strong></p>
-                  <p>You agree to comply with all applicable securities laws and regulations in your jurisdiction.</p>
+                  <p><strong>5. {t('terms.compliance')}</strong></p>
+                  <p>{t('terms.complianceText')}</p>
 
-                  <p><strong>6. Limitation of Liability</strong></p>
-                  <p>Our liability is limited to the maximum extent permitted by law. We are not liable for market losses or investment performance.</p>
+                  <p><strong>6. {t('terms.liability')}</strong></p>
+                  <p>{t('terms.liabilityText')}</p>
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-between">
@@ -77,12 +77,12 @@ export default function LegalStep({ formData, updateFormData, onValidationChange
                     onCheckedChange={(checked) => handleCheckboxChange('termsAccepted', checked as boolean)}
                   />
                   <Label htmlFor="terms" className="text-sm font-medium text-gray-900 cursor-pointer">
-                    I have read and accept the Terms of Service *
+                    {t('legal.termsAccept')} {t('required')}
                   </Label>
                 </div>
                 <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
                   <ExternalLink className="w-4 h-4 mr-1" />
-                  Full Terms
+                  {t('legal.fullTerms')}
                 </Button>
               </div>
             </div>
@@ -94,26 +94,26 @@ export default function LegalStep({ formData, updateFormData, onValidationChange
           <div className="flex items-start space-x-4">
             <Shield className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Privacy Policy</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('legal.privacyTitle')}</h3>
               <div className="bg-gray-50 rounded-lg p-4 max-h-48 overflow-y-auto border text-sm text-gray-700 leading-relaxed">
                 <div className="space-y-3">
-                  <p><strong>1. Information Collection</strong></p>
-                  <p>We collect personal information necessary for account verification, compliance, and service provision including name, address, financial information, and identification documents.</p>
+                  <p><strong>1. {t('privacy.collection')}</strong></p>
+                  <p>{t('privacy.collectionText')}</p>
 
-                  <p><strong>2. Data Usage</strong></p>
-                  <p>Your information is used for account management, regulatory compliance, fraud prevention, and to provide investment services.</p>
+                  <p><strong>2. {t('privacy.usage')}</strong></p>
+                  <p>{t('privacy.usageText')}</p>
 
-                  <p><strong>3. Data Protection</strong></p>
-                  <p>We employ industry-standard security measures including encryption, secure servers, and access controls to protect your personal information.</p>
+                  <p><strong>3. {t('privacy.protection')}</strong></p>
+                  <p>{t('privacy.protectionText')}</p>
 
-                  <p><strong>4. Information Sharing</strong></p>
-                  <p>We may share information with regulatory authorities, service providers, and as required by law. We do not sell personal information to third parties.</p>
+                  <p><strong>4. {t('privacy.sharing')}</strong></p>
+                  <p>{t('privacy.sharingText')}</p>
 
-                  <p><strong>5. Data Retention</strong></p>
-                  <p>We retain your information as required by law and for legitimate business purposes. You may request data deletion subject to regulatory requirements.</p>
+                  <p><strong>5. {t('privacy.retention')}</strong></p>
+                  <p>{t('privacy.retentionText')}</p>
 
-                  <p><strong>6. Your Rights</strong></p>
-                  <p>You have the right to access, correct, and request deletion of your personal information, subject to regulatory constraints.</p>
+                  <p><strong>6. {t('privacy.rights')}</strong></p>
+                  <p>{t('privacy.rightsText')}</p>
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-between">
@@ -124,12 +124,12 @@ export default function LegalStep({ formData, updateFormData, onValidationChange
                     onCheckedChange={(checked) => handleCheckboxChange('privacyAccepted', checked as boolean)}
                   />
                   <Label htmlFor="privacy" className="text-sm font-medium text-gray-900 cursor-pointer">
-                    I have read and accept the Privacy Policy *
+                    {t('legal.privacyAccept')} {t('required')}
                   </Label>
                 </div>
                 <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700">
                   <ExternalLink className="w-4 h-4 mr-1" />
-                  Full Policy
+                  {t('legal.fullPolicy')}
                 </Button>
               </div>
             </div>
@@ -145,9 +145,9 @@ export default function LegalStep({ formData, updateFormData, onValidationChange
               <span className="text-lg">📧</span>
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Marketing Communications</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('legal.marketingTitle')}</h3>
               <p className="text-sm text-gray-600 mb-4">
-                Stay informed about new investment opportunities, market insights, and platform updates.
+                {t('legal.marketingDescription')}
               </p>
               <div className="flex items-center space-x-3">
                 <Checkbox
@@ -156,11 +156,11 @@ export default function LegalStep({ formData, updateFormData, onValidationChange
                   onCheckedChange={(checked) => handleCheckboxChange('marketingConsent', checked as boolean)}
                 />
                 <Label htmlFor="marketing" className="text-sm text-gray-700 cursor-pointer">
-                  I consent to receiving marketing communications via email and SMS (Optional)
+                  {t('legal.marketingAccept')}
                 </Label>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                You can unsubscribe at any time. This does not affect important account notifications.
+                {t('legal.marketingUnsubscribe')}
               </p>
             </div>
           </div>
@@ -169,8 +169,7 @@ export default function LegalStep({ formData, updateFormData, onValidationChange
 
       <div className="mt-8 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
         <p className="text-sm text-indigo-800">
-          <strong>⚖️ Legal Notice:</strong> These agreements are legally binding. Please review them carefully.
-          Contact our legal team if you have any questions before proceeding.
+          <strong>⚖️ {t('legal.notice')}</strong> {t('legal.noticeDescription')}
         </p>
       </div>
     </div>

@@ -79,7 +79,7 @@ interface ConfirmationStepProps {
   t?: (key: string, fallback?: string) => string
 }
 
-export default function ConfirmationStep({ formData, onValidationChange, submissionId, onSubmit, onResetData }: ConfirmationStepProps) {
+export default function ConfirmationStep({ formData, onValidationChange, submissionId, onSubmit, onResetData, t = (key, fallback) => fallback || key }: ConfirmationStepProps) {
 
   useEffect(() => {
     // Confirmation step is always valid
@@ -106,7 +106,7 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
       onSubmit()
     } else {
       console.log('Investor application submitted:', formData)
-      alert('Thank you! Your investor application has been submitted successfully. Our team will review your information and contact you within 2-3 business days.')
+      alert(t('toast.applicationSubmitted'))
     }
   }
 
@@ -122,32 +122,32 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
     <div className="space-y-8 animate-in fade-in-50 duration-700">
       {/* Summary Card */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Application Summary</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('confirmation.summaryTitle')}</h3>
 
         <div className="space-y-6">
           {/* Personal Information */}
           <div className="flex items-start space-x-3">
             <User className="w-5 h-5 text-blue-500 mt-0.5" />
             <div className="flex-1">
-              <h4 className="font-medium text-gray-900 mb-2">Personal Information</h4>
+              <h4 className="font-medium text-gray-900 mb-2">{t('confirmation.personalInfo')}</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
                 <div>
-                  <span className="font-medium">Name:</span> {formData.firstName} {formData.lastName}
+                  <span className="font-medium">{t('confirmation.name')}</span> {formData.firstName} {formData.lastName}
                 </div>
                 <div>
-                  <span className="font-medium">Gender:</span> {formData.gender || 'Not specified'}
+                  <span className="font-medium">{t('confirmation.gender')}</span> {formData.gender || t('confirmation.notSpecified')}
                 </div>
                 <div>
-                  <span className="font-medium">Email:</span> {formData.email}
+                  <span className="font-medium">{t('confirmation.email')}</span> {formData.email}
                 </div>
                 <div>
-                  <span className="font-medium">Phone:</span> {formData.phone}
+                  <span className="font-medium">{t('confirmation.phone')}</span> {formData.phone}
                 </div>
                 <div>
-                  <span className="font-medium">Birthdate:</span> {formData.birthdate ? new Date(formData.birthdate).toLocaleDateString() : 'Not specified'}
+                  <span className="font-medium">{t('confirmation.birthdate')}</span> {formData.birthdate ? new Date(formData.birthdate).toLocaleDateString() : t('confirmation.notSpecified')}
                 </div>
                 <div>
-                  <span className="font-medium">Nationality:</span> {formData.nationality || 'Not specified'}
+                  <span className="font-medium">{t('confirmation.nationality')}</span> {formData.nationality || t('confirmation.notSpecified')}
                 </div>
               </div>
             </div>
@@ -159,7 +159,7 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
           <div className="flex items-start space-x-3">
             <MapPin className="w-5 h-5 text-green-500 mt-0.5" />
             <div className="flex-1">
-              <h4 className="font-medium text-gray-900 mb-2">Address Information</h4>
+              <h4 className="font-medium text-gray-900 mb-2">{t('confirmation.addressInfo')}</h4>
               <div className="text-sm text-gray-600 space-y-1">
                 <div>{formData.addressLine1}</div>
                 {formData.addressLine2 && <div>{formData.addressLine2}</div>}
@@ -177,7 +177,7 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
           <div className="flex items-start space-x-3">
             <PieChart className="w-5 h-5 text-purple-500 mt-0.5" />
             <div className="flex-1">
-              <h4 className="font-medium text-gray-900 mb-2">Asset Information</h4>
+              <h4 className="font-medium text-gray-900 mb-2">{t('confirmation.assetInfo')}</h4>
               {formData.assets && formData.assets.length > 0 ? (
                 <div className="space-y-4">
                   {/* Transaction Table/List */}
@@ -185,11 +185,11 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
                     <table className="min-w-full text-sm text-left border rounded-lg">
                       <thead className="bg-gray-100">
                         <tr>
-                          <th className="px-3 py-2 font-medium">Date</th>
-                          <th className="px-3 py-2 font-medium">Quantity</th>
-                          <th className="px-3 py-2 font-medium">Price</th>
-                          <th className="px-3 py-2 font-medium">Total</th>
-                          <th className="px-3 py-2 font-medium">Proof</th>
+                          <th className="px-3 py-2 font-medium">{t('assets.transactionDate')}</th>
+                          <th className="px-3 py-2 font-medium">{t('assets.quantity')}</th>
+                          <th className="px-3 py-2 font-medium">{t('assets.price')}</th>
+                          <th className="px-3 py-2 font-medium">{t('assets.totalValue')}</th>
+                          <th className="px-3 py-2 font-medium">{t('assets.proofDocument')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -197,16 +197,16 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
                           <tr key={asset.id} className="border-b last:border-0">
                             <td className="px-3 py-2">{new Date(asset.transactionDate).toLocaleDateString()}</td>
                             <td className="px-3 py-2">{asset.quantity}</td>
-                            <td className="px-3 py-2">${asset.price}</td>
-                            <td className="px-3 py-2">${(parseFloat(asset.quantity) * parseFloat(asset.price)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            <td className="px-3 py-2">€{asset.price}</td>
+                            <td className="px-3 py-2">€{(parseFloat(asset.quantity) * parseFloat(asset.price)).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                             <td className="px-3 py-2">
                               {asset.proofFile ? (
                                 <span className="flex items-center text-green-600">
                                   <CheckCircle className="w-3 h-3 mr-1" />
-                                  Proof uploaded
+                                  {t('assets.uploadProof')}
                                 </span>
                               ) : (
-                                <span className="text-amber-600">No proof</span>
+                                <span className="text-amber-600">{t('assets.uploadFailed')}</span>
                               )}
                             </td>
                           </tr>
@@ -217,7 +217,7 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
                   <div className="mt-3 text-xs text-gray-500">
                     <span className="font-medium">Document Status:</span>
                     {' '}
-                    {formData.assets.filter(asset => asset.proofFile).length} of {formData.assets.length} transactions have proof documents
+                    {formData.assets.filter(asset => asset.proofFile).length} of {formData.assets.length} {t('confirmation.transactions')} have proof documents
                   </div>
                 </div>
               ) : (
@@ -234,39 +234,39 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
           <div className="flex items-start space-x-3">
             <Scale className="w-5 h-5 text-indigo-500 mt-0.5" />
             <div className="flex-1">
-              <h4 className="font-medium text-gray-900 mb-2">Legal Agreements</h4>
+              <h4 className="font-medium text-gray-900 mb-2">{t('confirmation.legalInfo')}</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-2">
-                  <span className="font-medium">Terms of Service:</span>
+                  <span className="font-medium">{t('legal.termsTitle')}:</span>
                   {formData.termsAccepted ? (
                     <span className="flex items-center text-green-600">
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Accepted
+                      {t('confirmation.agreed')}
                     </span>
                   ) : (
-                    <span className="text-red-600">Not Accepted</span>
+                    <span className="text-red-600">{t('confirmation.declined')}</span>
                   )}
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="font-medium">Privacy Policy:</span>
+                  <span className="font-medium">{t('legal.privacyTitle')}:</span>
                   {formData.privacyAccepted ? (
                     <span className="flex items-center text-green-600">
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Accepted
+                      {t('confirmation.agreed')}
                     </span>
                   ) : (
-                    <span className="text-red-600">Not Accepted</span>
+                    <span className="text-red-600">{t('confirmation.declined')}</span>
                   )}
                 </div>
                 <div className="flex items-center space-x-2 md:col-span-2">
-                  <span className="font-medium">Marketing Communications:</span>
+                  <span className="font-medium">{t('confirmation.marketingConsent')}:</span>
                   {formData.marketingConsent ? (
                     <span className="flex items-center text-blue-600">
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Opted In
+                      {t('confirmation.agreed')}
                     </span>
                   ) : (
-                    <span className="text-gray-500">Opted Out</span>
+                    <span className="text-gray-500">{t('confirmation.declined')}</span>
                   )}
                 </div>
               </div>
@@ -282,7 +282,7 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
               <h4 className="font-medium text-gray-900 mb-2">Application Status</h4>
               <div className="grid grid-cols-1 gap-4 text-sm text-gray-600">
                 <div>
-                  <span className="font-medium">Asset Information:</span>
+                  <span className="font-medium">{t('confirmation.assetInfo')}:</span>
                   {formData.assets && formData.assets.length > 0 ? (
                     <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Complete</span>
                   ) : (
