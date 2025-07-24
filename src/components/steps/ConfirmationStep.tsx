@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { CheckCircle, User, MapPin, Clock, ArrowRight, Scale, PieChart } from 'lucide-react'
 import type { FormData } from '../OnboardingWizard'
-import { flows } from '@ballerine/web-ui-sdk'
 
 // Ballerine KYC config (replace placeholders with real values as needed)
 const ballerineInitConfig = (submissionId: string | null | undefined) => ({
@@ -46,11 +45,13 @@ const ballerineInitConfig = (submissionId: string | null | undefined) => ({
       'kyc-mobile': {
         steps: [
           { name: 'welcome', id: 'welcome' },
-          { name: 'document-selection', id: 'document-selection', documentOptions: [
-            { type: 'id_card', kind: 'id_card' },
-            { type: 'drivers_license', kind: 'drivers_license' },
-            { type: 'passport', kind: 'passport' },
-          ] },
+          {
+            name: 'document-selection', id: 'document-selection', documentOptions: [
+              { type: 'id_card', kind: 'id_card' },
+              { type: 'drivers_license', kind: 'drivers_license' },
+              { type: 'passport', kind: 'passport' },
+            ]
+          },
           { name: 'document-photo', id: 'document-photo' },
           { name: 'check-document', id: 'check-document' },
           { name: 'document-photo-back-start', id: 'document-photo-back-start' },
@@ -81,7 +82,20 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
   useEffect(() => {
     // Confirmation step is always valid
     onValidationChange(true)
-     
+
+    // Mount KYC modal automatically if submissionId is present
+    if (submissionId) {
+
+      import('@ballerine/web-ui-sdk').then(({ flows }) => {
+        flows.init(ballerineInitConfig(submissionId)).then(() => {
+        flows.mount({
+          flowName: 'kyc-mobile',
+          elementId: 'kyc-container',
+            useModal: false,
+          });
+        });
+      })
+    }
     // onValidationChange is stable from parent, safe to omit from deps to prevent infinite loop
   }, [])
 
@@ -314,25 +328,6 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
       {/* KYC Modal Mount Point */}
       <div id="kyc-container"></div>
 
-      {/* Start KYC Verification Button */}
-      <div className="flex justify-end mt-6">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={async () => {
-            await flows.init(ballerineInitConfig(submissionId)).then(() => {
-              flows.mount({
-                flowName: 'kyc-mobile',
-                elementId: 'kyc-container',
-                useModal: false,
-              });
-            });
-          }}
-        >
-          Start KYC Verification
-        </Button>
-      </div>
-      
     </div>
   )
 }

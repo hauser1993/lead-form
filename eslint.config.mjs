@@ -1,19 +1,21 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import { configs as tseslintConfigs } from "@typescript-eslint/eslint-plugin";
+import reactX from "eslint-plugin-react-x";
+import reactDom from "eslint-plugin-react-dom";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+export default [
   {
+    files: ["**/*.{ts,tsx}"],
+    extends: [
+      ...tseslintConfigs.strictTypeChecked,
+      reactX.configs["recommended-typescript"],
+      reactDom.configs.recommended,
+      "next/core-web-vitals",
+      "next/typescript",
+    ],
     languageOptions: {
       parserOptions: {
+        project: ["./tsconfig.json"],
+        tsconfigRootDir: import.meta.dirname,
         warnOnUnsupportedTypeScriptVersion: false,
       },
     },
@@ -25,5 +27,3 @@ const eslintConfig = [
     },
   },
 ];
-
-export default eslintConfig;

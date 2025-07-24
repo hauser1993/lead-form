@@ -626,7 +626,8 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
   })
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto relative">
+      {/* Loading Overlay removed */}
       <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
         {/* Conditionally render header only for non-welcome and non-confirmation steps */}
         {currentStep > 0 && currentStep < steps.length - 1 && (
@@ -779,13 +780,13 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
             </div>
           )}
 
-          {/* Loading Indicator */}
-          {isLoading && (
+          {/* Loading Indicator (removed, now handled by overlay) */}
+          {/* {isLoading && (
             <div className="flex items-center justify-center py-4">
               <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
               <span className="ml-2 text-gray-600">Saving...</span>
             </div>
-          )}
+          )} */}
 
           {/* Navigation Buttons - only show for non-welcome and non-confirmation steps */}
           {currentStep > 0 && currentStep < steps.length - 1 && (
