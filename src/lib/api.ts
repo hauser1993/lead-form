@@ -1,6 +1,6 @@
 import type { FormData } from '@/components/OnboardingWizard'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://your-laravel-app.com/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://your-laravel-app.com'
 
 export interface ApiResponse<T = unknown> {
   success: boolean
@@ -75,7 +75,7 @@ class ApiService {
     email: string
     phone: string
   }): Promise<ApiResponse<SubmissionResponse>> {
-    return this.makeRequest<SubmissionResponse>('/investor/submissions', {
+    return this.makeRequest<SubmissionResponse>('/api/submissions', {
       method: 'POST',
       body: JSON.stringify({
         step: 1,
@@ -94,7 +94,7 @@ class ApiService {
     email: string
     phone: string
   }): Promise<ApiResponse<SubmissionResponse>> {
-    return this.makeRequest<SubmissionResponse>(`/investor/submissions/${submissionId}`, {
+    return this.makeRequest<SubmissionResponse>(`/api/submissions/${submissionId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         step: 1,
@@ -112,7 +112,7 @@ class ApiService {
     postalCode: string
     country: string
   }): Promise<ApiResponse<SubmissionResponse>> {
-    return this.makeRequest<SubmissionResponse>(`/investor/submissions/${submissionId}`, {
+    return this.makeRequest<SubmissionResponse>(`/api/submissions/${submissionId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         step: 2,
@@ -123,7 +123,7 @@ class ApiService {
 
   // Step 3: Update submission with asset information
   async updateAssetInfo(submissionId: string, data: Record<string, unknown>): Promise<ApiResponse<SubmissionResponse>> {
-    return this.makeRequest<SubmissionResponse>(`/investor/submissions/${submissionId}`, {
+    return this.makeRequest<SubmissionResponse>(`/api/submissions/${submissionId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         step: 3,
@@ -138,7 +138,7 @@ class ApiService {
     privacyAccepted: boolean
     marketingConsent: boolean
   }): Promise<ApiResponse<SubmissionResponse>> {
-    return this.makeRequest<SubmissionResponse>(`/investor/submissions/${submissionId}`, {
+    return this.makeRequest<SubmissionResponse>(`/api/submissions/${submissionId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         step: 4,
@@ -149,7 +149,7 @@ class ApiService {
 
   // Step 5: Submit final application
   async submitApplication(submissionId: string): Promise<ApiResponse<SubmissionResponse>> {
-    return this.makeRequest<SubmissionResponse>(`/investor/submissions/${submissionId}/submit`, {
+    return this.makeRequest<SubmissionResponse>(`/api/submissions/${submissionId}/submit`, {
       method: 'POST',
       body: JSON.stringify({
         step: 5,
@@ -160,12 +160,12 @@ class ApiService {
 
   // Get submission details
   async getSubmission(submissionId: string): Promise<ApiResponse<SubmissionResponse & { form_data: FormData }>> {
-    return this.makeRequest<SubmissionResponse & { form_data: FormData }>(`/investor/submissions/${submissionId}`)
+    return this.makeRequest<SubmissionResponse & { form_data: FormData }>(`/api/submissions/${submissionId}`)
   }
 
   // Update any step (for navigation back/forth)
   async updateStep(submissionId: string, step: number, data: Partial<FormData>): Promise<ApiResponse<SubmissionResponse>> {
-    return this.makeRequest<SubmissionResponse>(`/investor/submissions/${submissionId}`, {
+    return this.makeRequest<SubmissionResponse>(`/api/submissions/${submissionId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         step,
@@ -176,12 +176,12 @@ class ApiService {
 
   // Fetch all forms
   async getAllForms(): Promise<ApiResponse<Form[]>> {
-    return this.makeRequest<Form[]>('/forms')
+    return this.makeRequest<Form[]>('/api/forms')
   }
 
   // Fetch a specific form by slug
   async getFormBySlug(slug: string): Promise<ApiResponse<Form>> {
-    return this.makeRequest<Form>(`/forms/${slug}`)
+    return this.makeRequest<Form>(`/api/form/${slug}`)
   }
 }
 
