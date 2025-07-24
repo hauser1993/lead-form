@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { CheckCircle, User, MapPin, Clock, ArrowRight, Scale, PieChart } from 'lucide-react'
@@ -80,6 +80,7 @@ interface ConfirmationStepProps {
 }
 
 export default function ConfirmationStep({ formData, onValidationChange, submissionId, onSubmit, onResetData, t = (key, fallback) => fallback || key }: ConfirmationStepProps) {
+  const [isKycModalOpen, setIsKycModalOpen] = useState(false)
 
   useEffect(() => {
     // Confirmation step is always valid
@@ -292,6 +293,48 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
                 <div>
                   <span className="font-medium">KYC Status:</span>
                   <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Pending</span>
+                  <button
+                    type="button"
+                    className="ml-4 px-3 py-1 text-xs border border-yellow-300 rounded bg-white hover:bg-yellow-50 transition-colors"
+                    onClick={() => setIsKycModalOpen(true)}
+                  >
+                    Details
+                  </button>
+                </div>
+              </div>
+
+              {/* KYC Verification Details - now always visible */}
+              <div className="mt-6 space-y-4">
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <Clock className="w-5 h-5 text-yellow-600 mr-2" />
+                    <span className="font-medium text-yellow-800">Verification Pending</span>
+                  </div>
+                  <p className="text-sm text-yellow-700">
+                    Your KYC verification is currently being processed. This typically takes 24-48 hours.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="font-medium text-gray-900">What happens next:</h4>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-start">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Document verification (ID, passport, or driver's license)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Identity confirmation through selfie verification</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Final review and account activation</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-xs text-blue-700">
+                    <strong>Note:</strong> KYC verification is required by financial regulations to ensure secure and compliant investment services.
+                  </p>
                 </div>
               </div>
             </div>
@@ -299,36 +342,92 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
         </div>
       </div>
 
-      {/* Next Steps */}
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-green-100">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">What Happens Next?</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center">
-            <div className="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-2">
-              <span className="text-xl">📋</span>
+      {/* Next Steps - Investment Journey */}
+      <div className="bg-gradient-to-r from-green-50 via-emerald-50 to-blue-50 rounded-xl p-8 border border-green-200 shadow-sm">
+        <div className="text-center mb-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-2">🚀 Your Investment Journey Begins!</h3>
+          <p className="text-gray-600">Here's what happens next on your path to investment success</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Card 1: KYC */}
+          <div className="text-center p-4 bg-white rounded-lg border-2 border-green-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+              <span className="text-2xl">🆔</span>
             </div>
-            <h4 className="font-medium text-gray-900 mb-1">Review Process</h4>
-            <p className="text-xs text-gray-600">Our team reviews your application within 24 hours</p>
+            <h4 className="font-semibold text-gray-900 mb-2">Complete your KYC</h4>
+            <p className="text-sm text-gray-600 mb-2">Verify your identity with our secure Know Your Customer process</p>
+            <div className="inline-flex items-center text-xs text-green-700 bg-green-50 px-3 py-1 rounded-full font-semibold">
+              Step 1
+            </div>
           </div>
-          <div className="text-center">
-            <div className="w-12 h-12 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-2">
-              <span className="text-xl">✅</span>
+          {/* Card 2: Asset Review */}
+          <div className="text-center p-4 bg-white rounded-lg border-2 border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+              <span className="text-2xl">👥</span>
             </div>
-            <h4 className="font-medium text-gray-900 mb-1">Verification</h4>
-            <p className="text-xs text-gray-600">Complete asset information verification</p>
+            <h4 className="font-semibold text-gray-900 mb-2">Asset Review</h4>
+            <p className="text-sm text-gray-600 mb-2">One of our consultants will check your assets and investment history</p>
+            <div className="inline-flex items-center text-xs text-blue-700 bg-blue-50 px-3 py-1 rounded-full font-semibold">
+              Step 2
+            </div>
           </div>
-          <div className="text-center">
-            <div className="w-12 h-12 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-2">
-              <span className="text-xl">🚀</span>
+          {/* Card 3: Free Buy Offer */}
+          <div className="text-center p-4 bg-white rounded-lg border-2 border-purple-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+              <span className="text-2xl">🎁</span>
             </div>
-            <h4 className="font-medium text-gray-900 mb-1">Account Setup</h4>
-            <p className="text-xs text-gray-600">Access your investor dashboard and opportunities</p>
+            <h4 className="font-semibold text-gray-900 mb-2">Free Buy Offer</h4>
+            <p className="text-sm text-gray-600 mb-2">Receive exclusive access to our complimentary investment opportunity</p>
+            <div className="inline-flex items-center text-xs text-purple-700 bg-purple-50 px-3 py-1 rounded-full font-semibold">
+              Step 3
+            </div>
           </div>
         </div>
       </div>
 
       {/* KYC Modal Mount Point */}
       <div id="kyc-container"></div>
+
+      {/* KYC Information Modal - now empty */}
+      {isKycModalOpen && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.5)', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+          onClick={() => setIsKycModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto relative"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">KYC Verification Details</h3>
+              <button
+                type="button"
+                className="text-gray-400 hover:text-gray-700 p-1 rounded"
+                onClick={() => setIsKycModalOpen(false)}
+                aria-label="Close"
+              >
+                {/* X icon using SVG */}
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+              </button>
+            </div>
+            <div className="space-y-4">
+              <p className="text-gray-500 text-center py-8">
+                This modal is empty.
+              </p>
+              <div className="flex justify-end pt-4">
+                <button
+                  type="button"
+                  className="px-6 py-2 bg-yellow-100 text-yellow-900 rounded hover:bg-yellow-200 font-medium"
+                  onClick={() => setIsKycModalOpen(false)}
+                >
+                  Got it
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )
