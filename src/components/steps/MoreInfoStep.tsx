@@ -24,7 +24,9 @@ export default function MoreInfoStep({ formData, updateFormData, onValidationCha
                    formData.postalCode.trim() !== '' &&
                    formData.country.trim() !== ''
     onValidationChange(isValid)
-  }, [formData.addressLine1, formData.city, formData.state, formData.postalCode, formData.country]) // Removed onValidationChange to prevent infinite loops
+     
+    // onValidationChange is stable from parent, safe to omit from deps to prevent infinite loop
+  }, [formData.addressLine1, formData.city, formData.state, formData.postalCode, formData.country])
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     updateFormData({ [field]: value })

@@ -63,8 +63,13 @@ class ApiService {
     return delay + Math.random() * 1000
   }
 
-  private isRetryableError(error: any, status?: number): boolean {
+  private isRetryableError(error: unknown, status?: number): boolean {
     // Retry on network errors, 5xx errors, 429 (rate limit), and 408 (timeout)
+    // Network error: error is an object with a 'name' property of 'TypeError' or 'AbortError'
+    if (!status && error && typeof error === 'object' && 'name' in error) {
+      const err = error as { name?: string }
+      return err.name === 'TypeError' || err.name === 'AbortError'
+    }
     return !status || status >= 500 || status === 429 || status === 408
   }
 

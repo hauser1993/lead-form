@@ -196,7 +196,9 @@ export default function OnboardingWizard({ form }: OnboardingWizardProps) {
         clearTimeout(autoSaveTimeoutRef.current)
       }
     }
-  }, [hasUnsavedChanges, submissionId, isOnline, currentStep]) // Removed performAutoSave from dependencies
+     
+    // performAutoSave is stable (useCallback), safe to omit from deps
+  }, [hasUnsavedChanges, submissionId, isOnline, currentStep])
 
   // Load submission from localStorage on mount
   useEffect(() => {

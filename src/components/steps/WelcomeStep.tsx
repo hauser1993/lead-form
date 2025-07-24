@@ -27,7 +27,9 @@ export default function WelcomeStep({ onValidationChange, onStart, form }: Welco
   useEffect(() => {
     // Welcome step is always valid
     onValidationChange(true)
-  }, []) // Removed onValidationChange to prevent infinite loops
+     
+    // onValidationChange is stable from parent, safe to omit from deps to prevent infinite loop
+  }, [])
 
   const features = [
     {

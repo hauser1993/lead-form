@@ -5,6 +5,67 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { CheckCircle, User, MapPin, Clock, ArrowRight, Scale, PieChart } from 'lucide-react'
 import type { FormData } from '../OnboardingWizard'
+import { flows } from '@ballerine/web-ui-sdk'
+
+// Ballerine KYC config (replace placeholders with real values as needed)
+const ballerineInitConfig = (submissionId: string | null | undefined) => ({
+  backendConfig: {
+    baseUrl: process.env.NEXT_PUBLIC_KYC_BASE_URL || 'https://example.com/kyc',
+    endpoints: {
+      startVerification: '/v2/enduser/verify',
+      getVerificationStatus: '/v2/enduser/verify/status/{verificationId}',
+      processStepData: '/v2/enduser/verify/partial',
+      getConfig: '/v2/clients/{clientId}/config',
+      uploadFile: '/collection-flow/files1',
+      updateContext: '/collection-flow/sync/context',
+    },
+  },
+  translations: {
+    remoteUrl: process.env.NEXT_PUBLIC_API_URL + '/kyc/language/en/translations.json',
+  },
+  endUserInfo: {
+    id: submissionId || 'no-submission-id', // Use submissionId as user id 
+    language: 'en',
+  },
+  metricsConfig: {
+    enabled: false,
+  },
+  uiConfig: {
+    uiPack: 'default',
+    general: {
+      colors: {
+        primary: process.env.NEXT_PUBLIC_PRIMARY_COLOR || '#2563eb',
+      },
+      fonts: {
+        name: 'Inter',
+        link: 'https://fonts.googleapis.com/css2?family=Inter:wght@500',
+        weight: [500, 700],
+      },
+    },
+    flows: {
+      'kyc-mobile': {
+        steps: [
+          { name: 'welcome', id: 'welcome' },
+          { name: 'document-selection', id: 'document-selection', documentOptions: [
+            { type: 'id_card', kind: 'id_card' },
+            { type: 'drivers_license', kind: 'drivers_license' },
+            { type: 'passport', kind: 'passport' },
+          ] },
+          { name: 'document-photo', id: 'document-photo' },
+          { name: 'check-document', id: 'check-document' },
+          { name: 'document-photo-back-start', id: 'document-photo-back-start' },
+          { name: 'document-photo-back', id: 'document-photo-back' },
+          { name: 'check-document-photo-back', id: 'check-document-photo-back' },
+          { name: 'selfie-start', id: 'selfie-start' },
+          { name: 'selfie', id: 'selfie' },
+          { name: 'check-selfie', id: 'check-selfie' },
+          { name: 'loading', id: 'loading' },
+          { name: 'final', id: 'final' },
+        ],
+      },
+    },
+  },
+});
 
 interface ConfirmationStepProps {
   formData: FormData
@@ -20,7 +81,9 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
   useEffect(() => {
     // Confirmation step is always valid
     onValidationChange(true)
-  }, []) // Removed onValidationChange to prevent infinite loops
+     
+    // onValidationChange is stable from parent, safe to omit from deps to prevent infinite loop
+  }, [])
 
   const handleSubmit = () => {
     if (onSubmit) {
@@ -248,14 +311,28 @@ export default function ConfirmationStep({ formData, onValidationChange, submiss
         </div>
       </div>
 
-      {/* Legal Disclaimer */}
-      {/* Removed the Important: legal disclaimer section as requested. */}
-      {/* Reset Data Button */}
-      <div className="flex justify-end mt-8">
-        <Button variant="destructive" onClick={handleResetData} type="button">
-          Reset Data
+      {/* KYC Modal Mount Point */}
+      <div id="kyc-container"></div>
+
+      {/* Start KYC Verification Button */}
+      <div className="flex justify-end mt-6">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={async () => {
+            await flows.init(ballerineInitConfig(submissionId)).then(() => {
+              flows.mount({
+                flowName: 'kyc-mobile',
+                elementId: 'kyc-container',
+                useModal: false,
+              });
+            });
+          }}
+        >
+          Start KYC Verification
         </Button>
       </div>
+      
     </div>
   )
 }

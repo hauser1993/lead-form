@@ -21,7 +21,9 @@ export default function LegalStep({ formData, updateFormData, onValidationChange
   useEffect(() => {
     const isValid = formData.termsAccepted && formData.privacyAccepted
     onValidationChange(isValid)
-  }, [formData.termsAccepted, formData.privacyAccepted]) // Removed onValidationChange to prevent infinite loops
+     
+    // onValidationChange is stable from parent, safe to omit from deps to prevent infinite loop
+  }, [formData.termsAccepted, formData.privacyAccepted])
 
   const handleCheckboxChange = (field: keyof FormData, checked: boolean) => {
     updateFormData({ [field]: checked })
